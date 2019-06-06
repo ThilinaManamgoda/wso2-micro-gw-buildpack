@@ -1,5 +1,5 @@
 ---
-language: binary
+language: wso2-am-micro-gw
 default_versions: []
 dependencies: []
 include_files:
@@ -8,5 +8,5 @@ include_files:
   - bin/release
   - bin/supply
   - resources/wso2am-micro-gw-2.6.0.zip
-  - resources/jdk-8u211-linux-x64.tar.gz
+  - resources/openjdk-1.8.0_201.tar.gz
   - manifest.yml
