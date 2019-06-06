@@ -1,0 +1,10 @@
+---
+language: binary
+default_versions: []
+dependencies: []
+include_files:
+  - bin/detect
+  - bin/finalize
+  - bin/release
+  - bin/supply
+  - base/wso2am-micro-gw-2.6.0.zip
