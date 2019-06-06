@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+APP_DIR=$1
+
+echo "default_process_types:"
+echo "  web: /home/vcap/app/micro-gw-cf/bin/gateway -e listenerConfig.httpPort=\${PORT}"

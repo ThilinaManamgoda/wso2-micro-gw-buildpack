@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+APP_DIR=$1
+CACHE_DIR=$2
+DEPS_DIR=$3
+DEPS_IDX=$4
+
+echo "-----> Running supply --------------"
+
+export BUILD_PACK_DIR=$(dirname $(dirname $0))
+
+echo "-----> Creating ${DEPS_DIR}/${DEPS_IDX} directory"
+#  creates a directory for storing deps
+if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
+ then
+    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}"
+    exit 1
+fi
+
+echo "-----> Unpacking JDK: openjdk-1.8.0_201.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201"
+if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201;
+ then
+    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201"
+    exit 1
+fi
+
+if ! tar -xf ${BUILD_PACK_DIR}/resources/openjdk-1.8.0_201.tar.gz -C ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201;
+ then
+  echo  "couldn't extract the JDK to ${DEPS_DIR}/${DEPS_IDX}"
+  exit 1
+fi
+
+echo "-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
+cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
+---
+config:
+  JDKVersion: openjdk-1.8.0_201
+name: wso2-am-micro-gw
+version: 1.0.0
+EOF
+
+
+echo $(cat ${DEPS_DIR}/${DEPS_IDX}/config.yml)
+echo $(ls -l ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201)
+
+echo "-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
+ then
+    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
+    exit 1
+fi
+
+cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/profile.d/env
+export JAVA_HOME="/home/vcap/deps/${DEPS_IDX}/openjdk-1.8.0_201"
+EOF
+
+
+

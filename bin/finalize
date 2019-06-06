@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+APP_DIR=$1
+CACHE_DIR=$2
+DEPS_DIR=$3
+DEPS_IDX=$4
+
+export BUILD_PACK_DIR=$(dirname $(dirname $0))
+export JAVA_HOME=${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201
+
+
+WSO2_AM_GW_HOME="wso2am-micro-gw-2.6.0"
+
+# parameters for micro gateway
+PROJECT_NAME=""
+API_NAME=""
+VERSION=""
+SERVER_URL=""
+USER_NAME=""
+PASSWORD=""
+
+
+echo "-----> Running finalize --------------"
+
+source "${APP_DIR}/wso2-am-gw"
+
+
+TMP_DIR=$(mktemp -d -t finalizeXXX)
+
+echo "-----> Unzipping ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_HOME}.zip"
+if ! unzip -q -d ${TMP_DIR} ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_HOME}.zip;
+ then
+    echo "unable to unzip ${WSO2_AM_GW_HOME}.zip"
+    exit 1
+fi
+
+echo "-----> Setting up Micro gateway"
+if ! ${TMP_DIR}/${WSO2_AM_GW_HOME}/bin/micro-gw setup cf -a ${API_NAME} -v ${VERSION} \
+-u ${USER_NAME} -p ${PASSWORD} -s ${SERVER_URL} -t lib/platform/bre/security/ballerinaTruststore.p12 -w ballerina;
+then
+    echo "unable to create the project: cf"
+    exit 1
+fi
+
+echo "-----> Building Micro gateway"
+if ! ${TMP_DIR}/${WSO2_AM_GW_HOME}/bin/micro-gw build cf;
+then
+    echo "unable to create the project: cf"
+    exit 1
+fi
+
+echo "-----> Unzipping Micro gateway distribution"
+if ! unzip -q -d ${APP_DIR} $(pwd)/cf/target/micro-gw-cf.zip;
+ then
+   echo "unable to unzip the project zip: micro-gw-cf.zip"
+   exit 1
+fi
+
+echo "-----> Setting up permission"
+if ! chmod +x ${APP_DIR}/micro-gw-cf/bin/gateway;
+ then
+    echo  "couldn't configure permission for ${APP_DIR}/micro-gw-cf/bin/gateway"
+    exit 1
+fi
+
+echo "-----> Create the directory ${APP_DIR}/.profile.d"
+# to add envs create a bash script with required env in .profile.d
+if ! mkdir -p ${APP_DIR}/.profile.d;
+ then
+    echo  "couldn't create the directory ${APP_DIR}/.profile.d"
+    exit 1
+fi
+
+echo "-----> Setting up environment variables"
+if ! echo "export JAVA_HOME=/home/vcap/deps/${DEPS_IDX}/openjdk-1.8.0_201" >> "${APP_DIR}/.profile.d/env";
+ then
+    echo  "couldn't configure the env in ${APP_DIR}/.profile.d"
+    exit 1
+fi
+
