@@ -52,3 +52,10 @@ if ! rm -rf wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip; then
     exit 1
 fi
 
+if ! sed -i.'' "s|JDK_VERSION|${JDK_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/finalize ${BUILD_SCRIPT_DIR}/../bin/supply; then
+    echo "couldn't remove wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
+    exit 1
+fi
+
+test -f ${BUILD_SCRIPT_DIR}/../bin/finalize. && rm ${BUILD_SCRIPT_DIR}/../bin/finalize.
+test -f ${BUILD_SCRIPT_DIR}/../bin/supply. && rm ${BUILD_SCRIPT_DIR}/../bin/supply.

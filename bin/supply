@@ -19,14 +19,14 @@ if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
     exit 1
 fi
 
-echo "-----> Unpacking JDK: openjdk-1.8.0_201.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201"
-if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201;
+echo "-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
+if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
  then
-    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201"
+    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
     exit 1
 fi
 
-if ! tar -xf ${BUILD_PACK_DIR}/resources/openjdk-1.8.0_201.tar.gz -C ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201;
+if ! tar -xf ${BUILD_PACK_DIR}/resources/openjdk-JDK_VERSION.tar.gz -C ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
  then
   echo  "couldn't extract the JDK to ${DEPS_DIR}/${DEPS_IDX}"
   exit 1
@@ -36,14 +36,10 @@ echo "-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
 ---
 config:
-  JDKVersion: openjdk-1.8.0_201
+  JDKVersion: openjdk-JDK_VERSION
 name: wso2-am-micro-gw
 version: 1.0.0
 EOF
-
-
-echo $(cat ${DEPS_DIR}/${DEPS_IDX}/config.yml)
-echo $(ls -l ${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201)
 
 echo "-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
@@ -53,7 +49,7 @@ if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
 fi
 
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/profile.d/env
-export JAVA_HOME="/home/vcap/deps/${DEPS_IDX}/openjdk-1.8.0_201"
+export JAVA_HOME="/home/vcap/deps/${DEPS_IDX}/openjdk-JDK_VERSION"
 EOF
 
 

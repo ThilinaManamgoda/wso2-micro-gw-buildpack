@@ -8,7 +8,7 @@ DEPS_DIR=$3
 DEPS_IDX=$4
 
 export BUILD_PACK_DIR=$(dirname $(dirname $0))
-export JAVA_HOME=${DEPS_DIR}/${DEPS_IDX}/openjdk-1.8.0_201
+export JAVA_HOME=${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION
 
 
 WSO2_AM_GW_HOME="wso2am-micro-gw-2.6.0"
@@ -17,9 +17,10 @@ WSO2_AM_GW_HOME="wso2am-micro-gw-2.6.0"
 PROJECT_NAME=""
 API_NAME=""
 VERSION=""
-SERVER_URL=""
-USER_NAME=""
-PASSWORD=""
+APIM_SERVER_URL=""
+APIM_USER_NAME=""
+APIM_PASSWORD=""
+ANALYTICS_ENABLED=""
 
 
 echo "-----> Running finalize --------------"
@@ -38,7 +39,7 @@ fi
 
 echo "-----> Setting up Micro gateway"
 if ! ${TMP_DIR}/${WSO2_AM_GW_HOME}/bin/micro-gw setup cf -a ${API_NAME} -v ${VERSION} \
--u ${USER_NAME} -p ${PASSWORD} -s ${SERVER_URL} -t lib/platform/bre/security/ballerinaTruststore.p12 -w ballerina;
+-u ${APIM_USER_NAME} -p ${APIM_PASSWORD} -s ${APIM_SERVER_URL} -t lib/platform/bre/security/ballerinaTruststore.p12 -w ballerina;
 then
     echo "unable to create the project: cf"
     exit 1
@@ -66,7 +67,6 @@ if ! chmod +x ${APP_DIR}/micro-gw-cf/bin/gateway;
 fi
 
 echo "-----> Create the directory ${APP_DIR}/.profile.d"
-# to add envs create a bash script with required env in .profile.d
 if ! mkdir -p ${APP_DIR}/.profile.d;
  then
     echo  "couldn't create the directory ${APP_DIR}/.profile.d"
@@ -74,9 +74,8 @@ if ! mkdir -p ${APP_DIR}/.profile.d;
 fi
 
 echo "-----> Setting up environment variables"
-if ! echo "export JAVA_HOME=/home/vcap/deps/${DEPS_IDX}/openjdk-1.8.0_201" >> "${APP_DIR}/.profile.d/env";
+if ! echo "export JAVA_HOME=/home/vcap/deps/${DEPS_IDX}/openjdk-JDK_VERSION" >> "${APP_DIR}/.profile.d/env";
  then
     echo  "couldn't configure the env in ${APP_DIR}/.profile.d"
     exit 1
 fi
-

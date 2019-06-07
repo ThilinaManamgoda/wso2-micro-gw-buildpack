@@ -2,5 +2,38 @@
 
 APP_DIR=$1
 
+# analytics configurations
+ANALYTICS_ENABLED=""
+ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS=""
+ANALYTICS_UPLOADING_ENDPOINT=""
+ANALYTICS_ROTATING_PERIOD=""
+ANALYTICS_USERNAME=""
+ANALYTICS_PASSWORD=""
+
+# key manager configurations
+KEY_MANAGER_SERVER_URL=""
+KEY_MANAGER_USERNAME=""
+KEY_MANAGER_PASSWORD=""
+
+# read parameters
+source ./wso2-am-gw
+
+# concat all environment variables to "ENVS"
+ENVS=""
+
+# configure key manager
+test ! -z ${ANALYTICS_ENABLED} && ENVS="-e analytics.enable=${ANALYTICS_ENABLED}"
+test ! -z ${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS} && ENVS="${ENVS} -e analytics.uploadingTimeSpanInMillis=${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS}"
+test ! -z ${ANALYTICS_UPLOADING_ENDPOINT} && ENVS="${ENVS} -e analytics.uploadingEndpoint=\"${ANALYTICS_UPLOADING_ENDPOINT}\""
+test ! -z ${ANALYTICS_ROTATING_PERIOD} && ENVS="${ENVS} -e analytics.rotatingPeriod=${ANALYTICS_ROTATING_PERIOD}"
+test ! -z ${ANALYTICS_USERNAME} && ENVS="${ENVS} -e analytics.username=${ANALYTICS_USERNAME}"
+test ! -z ${ANALYTICS_PASSWORD} && ENVS="${ENVS} -e analytics.password=${ANALYTICS_PASSWORD}"
+
+# configure key manager
+test ! -z ${KEY_MANAGER_SERVER_URL} && ENVS="${ENVS} -e keyManager.serverUrl=\"${KEY_MANAGER_SERVER_URL}\""
+test ! -z ${KEY_MANAGER_USERNAME} && ENVS="${ENVS} -e keyManager.username=${KEY_MANAGER_USERNAME}"
+test ! -z ${KEY_MANAGER_PASSWORD} && ENVS="${ENVS} -e keyManager.password=${KEY_MANAGER_PASSWORD}"
+
 echo "default_process_types:"
-echo "  web: /home/vcap/app/micro-gw-cf/bin/gateway -e listenerConfig.httpPort=\${PORT}"
+echo "  web: /home/vcap/app/micro-gw-cf/bin/gateway -e listenerConfig.httpPort=\${PORT} ${ENVS}"
+
