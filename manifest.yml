@@ -7,6 +7,6 @@ include_files:
   - bin/finalize
   - bin/release
   - bin/supply
-  - resources/wso2am-micro-gw-2.6.0.zip
-  - resources/openjdk-1.8.0_201.tar.gz
+  - resources/wso2am-micro-gw-WSO2_AM_GW_VERSION.zip
+  - resources/openjdk-JDK_VERSION.tar.gz
   - manifest.yml

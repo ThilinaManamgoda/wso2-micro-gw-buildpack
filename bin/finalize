@@ -14,7 +14,7 @@ export BUILD_PACK_DIR=$(dirname $(dirname $0))
 export JAVA_HOME=${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION
 
 
-WSO2_AM_GW_HOME="wso2am-micro-gw-2.6.0"
+WSO2_AM_GW_HOME="wso2am-micro-gw-WSO2_AM_GW_VERSION"
 
 # parameters for micro gateway
 PROJECT_NAME=""

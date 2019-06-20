@@ -52,10 +52,16 @@ if ! rm -rf wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip; then
     exit 1
 fi
 
-if ! sed -i.'' "s|JDK_VERSION|${JDK_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/finalize ${BUILD_SCRIPT_DIR}/../bin/supply; then
-    echo "couldn't remove wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
+if ! sed -i.'' "s|JDK_VERSION|${JDK_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/finalize ${BUILD_SCRIPT_DIR}/../bin/supply ${BUILD_SCRIPT_DIR}/../manifest.yml ; then
+    echo "couldn't replace JDK_VERSION place holder"
+    exit 1
+fi
+
+if ! sed -i.'' "s|WSO2_AM_GW_VERSION|${WSO2_AM_GW_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/finalize  ${BUILD_SCRIPT_DIR}/../manifest.yml ; then
+    echo "couldn't replace JDK_VERSION place holder"
     exit 1
 fi
 
 test -f ${BUILD_SCRIPT_DIR}/../bin/finalize. && rm ${BUILD_SCRIPT_DIR}/../bin/finalize.
 test -f ${BUILD_SCRIPT_DIR}/../bin/supply. && rm ${BUILD_SCRIPT_DIR}/../bin/supply.
+test -f ${BUILD_SCRIPT_DIR}/../bin/manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../bin/manifest.yml.
