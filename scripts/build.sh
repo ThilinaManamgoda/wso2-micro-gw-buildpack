@@ -14,14 +14,18 @@ COLOR_REST="$(tput sgr0)"
 COLOR_RED="$(tput setaf 1)"
 COLOR_GREEN="$(tput setaf 2)"
 
-function echo_green() {
-   echo "${COLOR_GREEN}$1${COLOR_REST}"
-}
 
 function echo_red() {
    echo "${COLOR_RED}$1${COLOR_REST}"
 }
 
+function set_green() {
+   echo "${COLOR_GREEN}"
+}
+
+function reset_color() {
+   echo "${COLOR_REST}"
+}
 
 if ! cp ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz ${BUILD_SCRIPT_DIR}/../resources; then
     echo_red "couldn't copy ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz to ${BUILD_SCRIPT_DIR}/../resources"
@@ -80,8 +84,9 @@ test -f ${BUILD_SCRIPT_DIR}/../bin/finalize. && rm ${BUILD_SCRIPT_DIR}/../bin/fi
 test -f ${BUILD_SCRIPT_DIR}/../bin/supply. && rm ${BUILD_SCRIPT_DIR}/../bin/supply.
 test -f ${BUILD_SCRIPT_DIR}/../bin/manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../bin/manifest.yml.
 
-pushd ${BUILD_SCRIPT_DIR}../
- buildpack-packager build  -any-stack -cached
-popd
-
-echo_green "Please find the build pack ${BUILD_SCRIPT_DIR}/../wso2-am-micro-gw_buildpack-cached-v1.0.0.zip"
+pushd ${BUILD_SCRIPT_DIR}/../
+set_green
+ if ! buildpack-packager build  -any-stack -cached; then
+  echo_red "couldn't build the Build pack"
+ fi
+reset_color
