@@ -9,8 +9,8 @@ CERTIFICATE=""
 BUILD_SCRIPT_DIR=$(dirname $(dirname $0))
 source ${BUILD_SCRIPT_DIR}/configs
 
-if [[ ! -f "${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz" ]]; then
-    echo "${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz is not available"
+if ! cp ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz ${BUILD_SCRIPT_DIR}/../resources; then
+    echo "cannot copy ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz to ${BUILD_SCRIPT_DIR}/../resources"
     exit 1
 fi
 
