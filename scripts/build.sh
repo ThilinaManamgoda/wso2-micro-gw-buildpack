@@ -2,7 +2,6 @@
 
 set -e
 
-GREEN_BOLD="\e[1m\e[32m"
 
 WSO2_AM_GW_VERSION=""
 JDK_VERSION=""
@@ -68,4 +67,4 @@ test -f ${BUILD_SCRIPT_DIR}/../bin/finalize. && rm ${BUILD_SCRIPT_DIR}/../bin/fi
 test -f ${BUILD_SCRIPT_DIR}/../bin/supply. && rm ${BUILD_SCRIPT_DIR}/../bin/supply.
 test -f ${BUILD_SCRIPT_DIR}/../bin/manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../bin/manifest.yml.
 
-echo "${GREEN_BOLD}Done !. Please find the build pack ${BUILD_SCRIPT_DIR}/../wso2-am-micro-gw_buildpack-cached-v1.0.0.zip"
+echo "Please find the build pack ${BUILD_SCRIPT_DIR}/../wso2-am-micro-gw_buildpack-cached-v1.0.0.zip"
