@@ -80,4 +80,8 @@ test -f ${BUILD_SCRIPT_DIR}/../bin/finalize. && rm ${BUILD_SCRIPT_DIR}/../bin/fi
 test -f ${BUILD_SCRIPT_DIR}/../bin/supply. && rm ${BUILD_SCRIPT_DIR}/../bin/supply.
 test -f ${BUILD_SCRIPT_DIR}/../bin/manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../bin/manifest.yml.
 
+pushd ${BUILD_SCRIPT_DIR}../
+ buildpack-packager build  -any-stack -cached
+popd
+
 echo_green "Please find the build pack ${BUILD_SCRIPT_DIR}/../wso2-am-micro-gw_buildpack-cached-v1.0.0.zip"
