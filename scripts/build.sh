@@ -59,7 +59,7 @@ if ! sed -i.'' "s|JDK_VERSION|${JDK_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/final
 fi
 
 if ! sed -i.'' "s|WSO2_AM_GW_VERSION|${WSO2_AM_GW_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/finalize  ${BUILD_SCRIPT_DIR}/../manifest.yml ; then
-    echo "couldn't replace JDK_VERSION place holder"
+    echo "couldn't replace WSO2_AM_GW_VERSION place holder"
     exit 1
 fi
 
