@@ -9,25 +9,25 @@ CERTIFICATE=""
 BUILD_SCRIPT_DIR=$(dirname $(dirname $0))
 source ${BUILD_SCRIPT_DIR}/configs
 
-if [[ ! -f "${BUILD_SCRIPT_DIR}/../resources/openjdk-${JDK_VERSION}.tar.gz" ]]; then
-    echo "${BUILD_SCRIPT_DIR}/../resources/openjdk-${JDK_VERSION}.tar.gz is not available"
+if [[ ! -f "${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz" ]]; then
+    echo "${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz is not available"
     exit 1
 fi
 
-if [[ ! -f "${BUILD_SCRIPT_DIR}/../resources/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip" ]]; then
-    echo "${BUILD_SCRIPT_DIR}/../resources/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip is not available"
+if [[ ! -f "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip" ]]; then
+    echo "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip is not available"
     exit 1
 fi
 
-if ! unzip ${BUILD_SCRIPT_DIR}/../resources/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip; then
-    echo "couldn't unzip the ${BUILD_SCRIPT_DIR}/../resources/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
+if ! unzip ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip; then
+    echo "couldn't unzip the ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
     exit 1
 fi
 
-if [[ -f "${BUILD_SCRIPT_DIR}/../resources/${CERTIFICATE}" ]]; then
- keytool -import -alias cf-am-micro-gw -keystore wso2am-micro-gw-${WSO2_AM_GW_VERSION}/lib/platform/bre/security/ballerinaTruststore.p12 -file ${BUILD_SCRIPT_DIR}/../resources/${CERTIFICATE} -storepass ballerina  -noprompt
+if [[ -f "${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE}" ]]; then
+ keytool -import -alias cf-am-micro-gw -keystore wso2am-micro-gw-${WSO2_AM_GW_VERSION}/lib/platform/bre/security/ballerinaTruststore.p12 -file ${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE} -storepass ballerina  -noprompt
  else
-    echo "${BUILD_SCRIPT_DIR}/../resources/${CERTIFICATE} is not available"
+    echo "${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE} is not available"
     exit 1
 fi
 
