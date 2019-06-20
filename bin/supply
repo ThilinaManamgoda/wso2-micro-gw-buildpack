@@ -7,35 +7,46 @@ CACHE_DIR=$2
 DEPS_DIR=$3
 DEPS_IDX=$4
 
-GREEN_BOLD="\e[1m\e[32m"
-GREEN="\e[32m"
+COLOR_REST="$(tput sgr0)"
+COLOR_RED="$(tput setaf 1)"
+COLOR_GREEN="$(tput setaf 2)"
+COLOR_MAGENTA="$(tput setaf 5)"
 
-echo "${GREEN_BOLD}-----> Running supply"
+
+function echo_green() {
+   echo "${COLOR_GREEN}$1${COLOR_REST}"
+}
+
+function echo_red() {
+   echo "${COLOR_RED}$1${COLOR_REST}"
+}
+
+echo "${COLOR_MAGENTA}-----> Running supply${COLOR_REST}"
 
 export BUILD_PACK_DIR=$(dirname $(dirname $0))
 
-echo "${GREEN}-----> Creating ${DEPS_DIR}/${DEPS_IDX} directory"
+echo_green "-----> Creating ${DEPS_DIR}/${DEPS_IDX} directory"
 #  creates a directory for storing deps
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
  then
-    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}"
+    echo_red  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}"
     exit 1
 fi
 
-echo "${GREEN}-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
+echo_green "-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION$"
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
  then
-    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
+    echo_red  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
     exit 1
 fi
 
 if ! tar -xf ${BUILD_PACK_DIR}/resources/openjdk-JDK_VERSION.tar.gz -C ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
  then
-  echo  "couldn't extract the JDK to ${DEPS_DIR}/${DEPS_IDX}"
+  echo_red  "${COLOR_RED}couldn't extract the JDK to ${DEPS_DIR}/${DEPS_IDX}${COLOR_REST}"
   exit 1
 fi
 
-echo "${GREEN}-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
+echo_green "-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
 ---
 config:
@@ -44,10 +55,10 @@ name: wso2-am-micro-gw
 version: 1.0.0
 EOF
 
-echo "${GREEN}-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+echo_green "-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
  then
-    echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
+    echo_red  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
     exit 1
 fi
 
