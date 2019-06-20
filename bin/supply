@@ -7,11 +7,14 @@ CACHE_DIR=$2
 DEPS_DIR=$3
 DEPS_IDX=$4
 
-echo "-----> Running supply --------------"
+GREEN_BOLD="\e[1m\e[32m"
+GREEN="\e[32m"
+
+echo "${GREEN_BOLD}-----> Running supply"
 
 export BUILD_PACK_DIR=$(dirname $(dirname $0))
 
-echo "-----> Creating ${DEPS_DIR}/${DEPS_IDX} directory"
+echo "${GREEN}-----> Creating ${DEPS_DIR}/${DEPS_IDX} directory"
 #  creates a directory for storing deps
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
  then
@@ -19,7 +22,7 @@ if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
     exit 1
 fi
 
-echo "-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
+echo "${GREEN}-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
  then
     echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
@@ -32,7 +35,7 @@ if ! tar -xf ${BUILD_PACK_DIR}/resources/openjdk-JDK_VERSION.tar.gz -C ${DEPS_DI
   exit 1
 fi
 
-echo "-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
+echo "${GREEN}-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
 ---
 config:
@@ -41,7 +44,7 @@ name: wso2-am-micro-gw
 version: 1.0.0
 EOF
 
-echo "-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+echo "${GREEN}-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
  then
     echo  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"

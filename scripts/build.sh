@@ -2,13 +2,13 @@
 
 set -e
 
-WSO2_AM_GW_VERSION="2.6.0"
-JDK_VERSION="1.8.0_201"
-CERTIFICATE="ixdevwso2com.crt"
+WSO2_AM_GW_VERSION=""
+JDK_VERSION=""
+CERTIFICATE=""
 
 BUILD_SCRIPT_DIR=$(dirname $(dirname $0))
+source ${BUILD_SCRIPT_DIR}/configs
 
-echo ${BUILD_SCRIPT_DIR}
 if [[ ! -f "${BUILD_SCRIPT_DIR}/../resources/openjdk-${JDK_VERSION}.tar.gz" ]]; then
     echo "${BUILD_SCRIPT_DIR}/../resources/openjdk-${JDK_VERSION}.tar.gz is not available"
     exit 1
