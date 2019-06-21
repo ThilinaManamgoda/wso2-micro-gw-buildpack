@@ -72,7 +72,7 @@ fi
 
 test -f ${BUILD_SCRIPT_DIR}/../bin/finalize. && rm ${BUILD_SCRIPT_DIR}/../bin/finalize.
 test -f ${BUILD_SCRIPT_DIR}/../bin/supply. && rm ${BUILD_SCRIPT_DIR}/../bin/supply.
-test -f ${BUILD_SCRIPT_DIR}/../bin/manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../bin/manifest.yml.
+test -f ${BUILD_SCRIPT_DIR}/../manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../manifest.yml.
 
 pushd ${BUILD_SCRIPT_DIR}/../
  if ! buildpack-packager build  -any-stack -cached; then
