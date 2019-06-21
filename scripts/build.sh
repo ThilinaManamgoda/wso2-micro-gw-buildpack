@@ -10,21 +10,13 @@ CERTIFICATE=""
 BUILD_SCRIPT_DIR=$(dirname $(dirname $0))
 source ${BUILD_SCRIPT_DIR}/configs
 
-COLOR_REST="$(tput sgr0)"
-COLOR_RED="$(tput setaf 1)"
-COLOR_GREEN="$(tput setaf 2)"
-
+COLOR_REST="\e[0m"
+COLOR_RED="\e[31m"
+COLOR_GREEN="\e[32m"
+COLOR_PURPLE="\e[35m"
 
 function echo_red() {
    echo "${COLOR_RED}$1${COLOR_REST}"
-}
-
-function set_green() {
-   echo "${COLOR_GREEN}"
-}
-
-function reset_color() {
-   echo "${COLOR_REST}"
 }
 
 if ! cp ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz ${BUILD_SCRIPT_DIR}/../resources; then
@@ -85,8 +77,7 @@ test -f ${BUILD_SCRIPT_DIR}/../bin/supply. && rm ${BUILD_SCRIPT_DIR}/../bin/supp
 test -f ${BUILD_SCRIPT_DIR}/../bin/manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../bin/manifest.yml.
 
 pushd ${BUILD_SCRIPT_DIR}/../
-set_green
  if ! buildpack-packager build  -any-stack -cached; then
   echo_red "couldn't build the Build pack"
  fi
-reset_color
+
