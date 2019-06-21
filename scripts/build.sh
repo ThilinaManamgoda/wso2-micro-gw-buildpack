@@ -12,63 +12,61 @@ source ${BUILD_SCRIPT_DIR}/configs
 
 COLOR_REST="\e[0m"
 COLOR_RED="\e[31m"
-COLOR_GREEN="\e[32m"
-COLOR_PURPLE="\e[35m"
 
-function echo_red() {
+function echo_error() {
    echo "${COLOR_RED}$1${COLOR_REST}"
 }
 
 if ! cp ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz ${BUILD_SCRIPT_DIR}/../resources; then
-    echo_red "couldn't copy ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz to ${BUILD_SCRIPT_DIR}/../resources"
+    echo_error "couldn't copy ${BUILD_SCRIPT_DIR}/../dist/openjdk-${JDK_VERSION}.tar.gz to ${BUILD_SCRIPT_DIR}/../resources"
     exit 1
 fi
 
 if [[ ! -f "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip" ]]; then
-    echo_red "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip is not available"
+    echo_error "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip is not available"
     exit 1
 fi
 
 if ! unzip ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip; then
-    echo_red "couldn't unzip the ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
+    echo_error "couldn't unzip the ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
     exit 1
 fi
 
 if [[ -f "${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE}" ]]; then
  keytool -import -alias cf-am-micro-gw -keystore wso2am-micro-gw-${WSO2_AM_GW_VERSION}/lib/platform/bre/security/ballerinaTruststore.p12 -file ${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE} -storepass ballerina  -noprompt
  else
-    echo_red "${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE} is not available"
+    echo_error "${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE} is not available"
     exit 1
 fi
 
 if ! zip -r wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip wso2am-micro-gw-${WSO2_AM_GW_VERSION}/*;
  then
-    echo_red "couldn't package wso2am-micro-gw-${WSO2_AM_GW_VERSION}/* to wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
+    echo_error "couldn't package wso2am-micro-gw-${WSO2_AM_GW_VERSION}/* to wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
     exit 1
 fi
 
 if ! cp wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip ${BUILD_SCRIPT_DIR}/../resources; then
-    echo_red "couldn't copy wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip to ${BUILD_SCRIPT_DIR}/../resources"
+    echo_error "couldn't copy wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip to ${BUILD_SCRIPT_DIR}/../resources"
     exit 1
 fi
 
 if ! rm -rf wso2am-micro-gw-${WSO2_AM_GW_VERSION}; then
-    echo_red "couldn't remove wso2am-micro-gw-${WSO2_AM_GW_VERSION}"
+    echo_error "couldn't remove wso2am-micro-gw-${WSO2_AM_GW_VERSION}"
     exit 1
 fi
 
 if ! rm -rf wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip; then
-    echo_red "couldn't remove wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
+    echo_error "couldn't remove wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip"
     exit 1
 fi
 
 if ! sed -i.'' "s|JDK_VERSION|${JDK_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/finalize ${BUILD_SCRIPT_DIR}/../bin/supply ${BUILD_SCRIPT_DIR}/../manifest.yml ; then
-    echo_red "couldn't replace JDK_VERSION place holder"
+    echo_error "couldn't replace JDK_VERSION place holder"
     exit 1
 fi
 
 if ! sed -i.'' "s|WSO2_AM_GW_VERSION|${WSO2_AM_GW_VERSION}|g" ${BUILD_SCRIPT_DIR}/../bin/finalize  ${BUILD_SCRIPT_DIR}/../manifest.yml ; then
-    echo_red "couldn't replace WSO2_AM_GW_VERSION place holder"
+    echo_error "couldn't replace WSO2_AM_GW_VERSION place holder"
     exit 1
 fi
 
@@ -78,6 +76,6 @@ test -f ${BUILD_SCRIPT_DIR}/../bin/manifest.yml. && rm ${BUILD_SCRIPT_DIR}/../bi
 
 pushd ${BUILD_SCRIPT_DIR}/../
  if ! buildpack-packager build  -any-stack -cached; then
-  echo_red "couldn't build the Build pack"
+  echo_error "couldn't build the Build pack"
  fi
 
