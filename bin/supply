@@ -7,29 +7,29 @@ CACHE_DIR=$2
 DEPS_DIR=$3
 DEPS_IDX=$4
 
-COLOR_REST="$(tput sgr0)"
-COLOR_RED="$(tput setaf 1)"
-COLOR_GREEN="$(tput setaf 2)"
-COLOR_MAGENTA="$(tput setaf 5)"
+COLOR_REST="\e[0m"
+COLOR_RED="\e[31m"
+COLOR_GREEN="\e[32m"
+COLOR_PURPLE="\e[35m"
 
 
-function echo_green() {
-   echo "${COLOR_GREEN}$1${COLOR_REST}"
+function echo_info() {
+   echo -e "${COLOR_GREEN}$1${COLOR_REST}"
 }
 
-function echo_red() {
-   echo "${COLOR_RED}$1${COLOR_REST}"
+function echo_error() {
+   echo -e "${COLOR_RED}$1${COLOR_REST}"
 }
 
-echo "${COLOR_MAGENTA}-----> Running supply${COLOR_REST}"
+echo -e "${COLOR_PURPLE}-----> Running supply${COLOR_REST}"
 
 export BUILD_PACK_DIR=$(dirname $(dirname $0))
 
-echo_green "-----> Creating ${DEPS_DIR}/${DEPS_IDX} directory"
+echo_info "-----> Creating ${DEPS_DIR}/${DEPS_IDX} directory"
 #  creates a directory for storing deps
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
  then
-    echo_red  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}"
+    echo_error  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}"
     exit 1
 fi
 
@@ -42,11 +42,11 @@ fi
 
 if ! tar -xf ${BUILD_PACK_DIR}/resources/openjdk-JDK_VERSION.tar.gz -C ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
  then
-  echo_red  "${COLOR_RED}couldn't extract the JDK to ${DEPS_DIR}/${DEPS_IDX}${COLOR_REST}"
+  echo_error  "Couldn't extract the JDK to ${DEPS_DIR}/${DEPS_IDX}"
   exit 1
 fi
 
-echo_green "-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
+echo_info "-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
 ---
 config:
@@ -55,10 +55,10 @@ name: wso2-am-micro-gw
 version: 1.0.0
 EOF
 
-echo_green "-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+echo_info "-----> Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
  then
-    echo_red  "couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
+    echo_error  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
     exit 1
 fi
 

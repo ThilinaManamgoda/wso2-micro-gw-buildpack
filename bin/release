@@ -16,7 +16,7 @@ KEY_MANAGER_USERNAME=""
 KEY_MANAGER_PASSWORD=""
 
 # read parameters
-source ./wso2-am-gw
+source ${APP_DIR}/wso2-am-gw
 
 # concat all environment variables to "ENVS"
 ENVS=""

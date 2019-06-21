@@ -8,10 +8,10 @@ DEPS_DIR=$3
 DEPS_IDX=$4
 
 
-COLOR_REST="$(tput sgr0)"
-COLOR_RED="$(tput setaf 1)"
-COLOR_GREEN="$(tput setaf 2)"
-COLOR_MAGENTA="$(tput setaf 5)"
+COLOR_REST="\e[0m"
+COLOR_RED="\e[31m"
+COLOR_GREEN="\e[32m"
+COLOR_PURPLE="\e[35m"
 
 export BUILD_PACK_DIR=$(dirname $(dirname $0))
 export JAVA_HOME=${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION
@@ -28,67 +28,66 @@ APIM_USER_NAME=""
 APIM_PASSWORD=""
 ANALYTICS_ENABLED=""
 
-function echo_green() {
-   echo "${COLOR_GREEN}$1${COLOR_REST}"
+function echo_info() {
+   echo -e "${COLOR_GREEN}$1${COLOR_REST}"
 }
 
-function echo_red() {
-   echo "${COLOR_RED}$1${COLOR_REST}"
+function echo_error() {
+   echo -e "${COLOR_RED}$1${COLOR_REST}"
 }
 
-echo "${COLOR_MAGENTA}-----> Running finalize${COLOR_REST}"
+echo -e "${COLOR_PURPLE}-----> Running finalize${COLOR_REST}"
 
 source "${APP_DIR}/wso2-am-gw"
 
-
 TMP_DIR=$(mktemp -d -t finalizeXXX)
 
-echo_green "-----> Unzipping ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_HOME}.zip"
+echo_info "-----> Unzipping ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_HOME}.zip"
 if ! unzip -q -d ${TMP_DIR} ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_HOME}.zip;
  then
-    echo_red "unable to unzip ${WSO2_AM_GW_HOME}.zip"
+    echo_error "Unable to unzip ${WSO2_AM_GW_HOME}.zip"
     exit 1
 fi
 
-echo_green "-----> Setting up Micro gateway"
+echo_info "-----> Setting up Micro gateway"
 if ! ${TMP_DIR}/${WSO2_AM_GW_HOME}/bin/micro-gw setup cf -a ${API_NAME} -v ${VERSION} \
 -u ${APIM_USER_NAME} -p ${APIM_PASSWORD} -s ${APIM_SERVER_URL} -t lib/platform/bre/security/ballerinaTruststore.p12 -w ballerina;
 then
-    echo_red "unable to create the project: cf"
+    echo_error "Unable to create the project: cf"
     exit 1
 fi
 
-echo_green "-----> Building Micro gateway"
+echo_info "-----> Building Micro gateway"
 if ! ${TMP_DIR}/${WSO2_AM_GW_HOME}/bin/micro-gw build cf;
 then
-    echo_red "unable to build the project: cf"
+    echo_error "Unable to build the project: cf"
     exit 1
 fi
 
-echo_green "-----> Unzipping Micro gateway distribution"
+echo_info "-----> Unzipping Micro gateway distribution"
 if ! unzip -q -d ${APP_DIR} $(pwd)/cf/target/micro-gw-cf.zip;
  then
-   echo_red "unable to unzip the project zip: micro-gw-cf.zip"
+   echo_error "Unable to unzip the project zip: micro-gw-cf.zip"
    exit 1
 fi
 
-echo_green "-----> Setting up permission"
+echo_info "-----> Setting up permission"
 if ! chmod +x ${APP_DIR}/micro-gw-cf/bin/gateway;
  then
-    echo_red "couldn't configure permission for ${APP_DIR}/micro-gw-cf/bin/gateway"
+    echo_error "Couldn't configure permission for ${APP_DIR}/micro-gw-cf/bin/gateway"
     exit 1
 fi
 
-echo_green "-----> Create the directory ${APP_DIR}/.profile.d"
+echo_info "-----> Creating the directory ${APP_DIR}/.profile.d"
 if ! mkdir -p ${APP_DIR}/.profile.d;
  then
-    echo_red "couldn't create the directory ${APP_DIR}/.profile.d"
+    echo_error "Couldn't create the directory ${APP_DIR}/.profile.d"
     exit 1
 fi
 
 echo_green "-----> Setting up environment variables"
 if ! echo "export JAVA_HOME=/home/vcap/deps/${DEPS_IDX}/openjdk-JDK_VERSION" >> "${APP_DIR}/.profile.d/env";
  then
-    echo_red "couldn't configure the env in ${APP_DIR}/.profile.d"
+    echo_error "Couldn't configure the env in ${APP_DIR}/.profile.d"
     exit 1
 fi
