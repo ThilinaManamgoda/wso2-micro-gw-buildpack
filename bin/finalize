@@ -85,7 +85,7 @@ if ! mkdir -p ${APP_DIR}/.profile.d;
     exit 1
 fi
 
-echo_green "-----> Setting up environment variables"
+echo_info "-----> Setting up environment variables"
 if ! echo "export JAVA_HOME=/home/vcap/deps/${DEPS_IDX}/openjdk-JDK_VERSION" >> "${APP_DIR}/.profile.d/env";
  then
     echo_error "Couldn't configure the env in ${APP_DIR}/.profile.d"

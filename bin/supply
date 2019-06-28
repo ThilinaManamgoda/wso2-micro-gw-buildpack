@@ -33,10 +33,10 @@ if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
     exit 1
 fi
 
-echo_green "-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION$"
+echo_info "-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION$"
 if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
  then
-    echo_red  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
+    echo_error  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
     exit 1
 fi
 
