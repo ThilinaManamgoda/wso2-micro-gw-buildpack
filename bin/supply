@@ -28,6 +28,7 @@ COLOR_RED="\e[31m"
 COLOR_GREEN="\e[32m"
 COLOR_PURPLE="\e[35m"
 
+OPEN_JDK="openjdk-JDK_VERSION"
 
 function echo_info() {
    echo -e "${COLOR_GREEN}$1${COLOR_REST}"
@@ -49,14 +50,14 @@ if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX};
     exit 1
 fi
 
-echo_info "-----> Unpacking JDK: openjdk-JDK_VERSION.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION$"
-if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
+echo_info "-----> Unpacking JDK: ${OPEN_JDK}.tar.gz to  ${DEPS_DIR}/${DEPS_IDX}/${OPEN_JDK}"
+if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/${OPEN_JDK};
  then
-    echo_error  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION"
+    echo_error  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/${OPEN_JDK}"
     exit 1
 fi
 
-if ! tar -xf ${BUILD_PACK_DIR}/resources/openjdk-JDK_VERSION.tar.gz -C ${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION;
+if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${DEPS_DIR}/${DEPS_IDX}/${OPEN_JDK};
  then
   echo_error  "Couldn't extract the JDK to ${DEPS_DIR}/${DEPS_IDX}"
   exit 1
@@ -66,7 +67,7 @@ echo_info "-----> Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
 ---
 config:
-  JDKVersion: openjdk-JDK_VERSION
+  JDKVersion: ${OPEN_JDK}
 name: wso2-am-micro-gw
 version: 1.0.0
 EOF
@@ -79,7 +80,7 @@ if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
 fi
 
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/profile.d/env
-export JAVA_HOME="/home/vcap/deps/${DEPS_IDX}/openjdk-JDK_VERSION"
+export JAVA_HOME="/home/vcap/deps/${DEPS_IDX}/${OPEN_JDK}"
 EOF
 
 

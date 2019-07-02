@@ -29,8 +29,10 @@ COLOR_RED="\e[31m"
 COLOR_GREEN="\e[32m"
 COLOR_PURPLE="\e[35m"
 
+OPEN_JDK="openjdk-JDK_VERSION"
+
 export BUILD_PACK_DIR=$(dirname $(dirname $0))
-export JAVA_HOME=${DEPS_DIR}/${DEPS_IDX}/openjdk-JDK_VERSION
+export JAVA_HOME=${DEPS_DIR}/${DEPS_IDX}/${OPEN_JDK}
 
 
 WSO2_AM_GW_HOME="wso2am-micro-gw-WSO2_AM_GW_VERSION"
@@ -102,7 +104,7 @@ if ! mkdir -p ${APP_DIR}/.profile.d;
 fi
 
 echo_info "-----> Setting up environment variables"
-if ! echo "export JAVA_HOME=/home/vcap/deps/${DEPS_IDX}/openjdk-JDK_VERSION" >> "${APP_DIR}/.profile.d/env";
+if ! echo "export JAVA_HOME=/home/vcap/deps/${DEPS_IDX}/${OPEN_JDK}" >> "${APP_DIR}/.profile.d/env";
  then
     echo_error "Couldn't configure the env in ${APP_DIR}/.profile.d"
     exit 1
