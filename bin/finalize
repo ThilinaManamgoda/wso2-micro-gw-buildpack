@@ -42,7 +42,7 @@ VERSION=""
 APIM_SERVER_URL=""
 APIM_USER_NAME=""
 APIM_PASSWORD=""
-ANALYTICS_ENABLED=""
+
 
 function echo_info() {
    echo -e "${COLOR_GREEN}$1${COLOR_REST}"
