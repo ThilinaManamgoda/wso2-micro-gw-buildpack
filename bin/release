@@ -51,5 +51,5 @@ test ! -z ${KEY_MANAGER_USERNAME} && ENVS="${ENVS} -e keyManager.username=${KEY_
 test ! -z ${KEY_MANAGER_PASSWORD} && ENVS="${ENVS} -e keyManager.password=${KEY_MANAGER_PASSWORD}"
 
 echo "default_process_types:"
-echo "  web: /home/vcap/app/micro-gw-cf/bin/gateway -e listenerConfig.httpPort=\${PORT} ${ENVS}"
+echo "  web: /home/vcap/app/micro-gw-cf-app/bin/gateway -e listenerConfig.httpPort=\${PORT} ${ENVS}"
 
