@@ -17,6 +17,7 @@
 # under the License.
 
 APP_DIR=$1
+PROJECT_NAME="cf-app"
 
 # analytics configurations
 ANALYTICS_ENABLED=""
@@ -51,5 +52,5 @@ test ! -z ${KEY_MANAGER_USERNAME} && ENVS="${ENVS} -e keyManager.username=${KEY_
 test ! -z ${KEY_MANAGER_PASSWORD} && ENVS="${ENVS} -e keyManager.password=${KEY_MANAGER_PASSWORD}"
 
 echo "default_process_types:"
-echo "  web: /home/vcap/app/micro-gw-cf-app/bin/gateway -e listenerConfig.httpPort=\${PORT} ${ENVS}"
+echo "  web: /home/vcap/app/micro-gw-${PROJECT_NAME}/bin/gateway -e listenerConfig.httpPort=\${PORT} ${ENVS}"
 

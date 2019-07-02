@@ -37,7 +37,6 @@ WSO2_AM_GW_HOME="wso2am-micro-gw-WSO2_AM_GW_VERSION"
 PROJECT_NAME="cf-app"
 
 # parameters for micro gateway
-PROJECT_NAME=""
 API_NAME=""
 VERSION=""
 APIM_SERVER_URL=""
