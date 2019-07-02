@@ -21,7 +21,6 @@ set -e
 
 WSO2_AM_GW_VERSION=""
 JDK_VERSION=""
-CERTIFICATE=""
 
 BUILD_SCRIPT_DIR=$(dirname $(dirname $0))
 source ${BUILD_SCRIPT_DIR}/configs
@@ -48,12 +47,13 @@ if ! unzip ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip
     exit 1
 fi
 
-if [[ -f "${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE}" ]]; then
- keytool -import -alias cf-am-micro-gw -keystore wso2am-micro-gw-${WSO2_AM_GW_VERSION}/lib/platform/bre/security/ballerinaTruststore.p12 -file ${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE} -storepass ballerina  -noprompt
- else
-    echo_error "${BUILD_SCRIPT_DIR}/../dist/${CERTIFICATE} is not available"
-    exit 1
-fi
+# import certificates
+for entry in "${BUILD_SCRIPT_DIR}/../dist/certs"/*
+do
+  cert_file=$(basename -- "$entry")
+  cert_name="${cert_file%.*}"
+  keytool -import -alias ${cert_name} -keystore wso2am-micro-gw-${WSO2_AM_GW_VERSION}/lib/platform/bre/security/ballerinaTruststore.p12 -file ${entry} -storepass ballerina  -noprompt
+done
 
 if ! zip -r wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip wso2am-micro-gw-${WSO2_AM_GW_VERSION}/*;
  then
