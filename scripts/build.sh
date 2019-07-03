@@ -48,12 +48,19 @@ if ! unzip ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-${WSO2_AM_GW_VERSION}.zip
     exit 1
 fi
 
-# import certificates
-for cert in "${BUILD_SCRIPT_DIR}/../dist/certs"/*
+# import certificates for platform
+for cert in "${BUILD_SCRIPT_DIR}/../dist/certs/platform"/*
 do
   cert_file=$(basename -- "$cert")
   cert_name="${cert_file%.*}"
   keytool -import -alias ${cert_name} -keystore ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-${WSO2_AM_GW_VERSION}/lib/platform/bre/security/ballerinaTruststore.p12 -file ${cert} -storepass ${TRUST_STORE_PASSWORD}  -noprompt
+done
+
+# import certificates for runtime
+for cert in "${BUILD_SCRIPT_DIR}/../dist/certs/runtime"/*
+do
+  cert_file=$(basename -- "$cert")
+  cert_name="${cert_file%.*}"
   keytool -import -alias ${cert_name} -keystore ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-${WSO2_AM_GW_VERSION}/lib/runtime/bre/security/ballerinaTruststore.p12 -file ${cert} -storepass ${TRUST_STORE_PASSWORD}  -noprompt
 done
 
