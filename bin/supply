@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+    
+# Copyright (c) 2019 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# WSO2 Inc. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+set -euo pipefail
+
+APP_DIR=$1
+CACHE_DIR=$2
+DEPS_DIR=$3
+DEPS_IDX=$4
+
+
+COLOR_REST="\e[0m"
+COLOR_RED="\e[31m"
+COLOR_GREEN="\e[32m"
+COLOR_PURPLE="\e[35m"
+
+function echo_info() {
+   echo -e "${COLOR_GREEN}-----> $1${COLOR_REST}"
+}
+
+function echo_error_exit() {
+   echo -e "${COLOR_RED}$1${COLOR_REST}"
+   exit 1
+}
+
+function echo_stage() {
+   echo -e "${COLOR_PURPLE}-----> $1${COLOR_REST}"
+}
+
+echo_stage "Running supply"
+
+export BUILD_PACK_DIR=$(dirname $(dirname $0))
+WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
+
+echo_info "Creating ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME} directory"
+#  creates a directory for storing deps
+if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME};
+ then
+    echo_error_exit  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}"
+    exit 1
+fi
+
+echo_info "Unzipping Micro gateway runtime"
+if ! unzip -q -d ${DEPS_DIR}/${DEPS_IDX} ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_RUNTIME}.zip;
+ then
+   echo_error_exit "Unable to unzip Micro gateway runtime zip: ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_RUNTIME}.zip"
+   exit 1
+fi
+
+echo_info "Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
+cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
+---
+config:
+  MicroGatewayRuntime: 3.0.0
+name: wso2-am-micro-gw
+version: 1.0.0
+EOF
+
+echo_info "Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
+ then
+    echo_error_exit  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
+    exit 1
+fi
+
+cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/profile.d/env
+export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/"
+EOF

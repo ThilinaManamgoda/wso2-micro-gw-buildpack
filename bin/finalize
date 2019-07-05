@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+    
+# Copyright (c) 2019 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+#
+# WSO2 Inc. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+set -euo pipefail
+
+APP_DIR=$1
+CACHE_DIR=$2
+DEPS_DIR=$3
+DEPS_IDX=$4
+
+
+COLOR_REST="\e[0m"
+COLOR_RED="\e[31m"
+COLOR_GREEN="\e[32m"
+COLOR_PURPLE="\e[35m"
+
+function echo_info() {
+   echo -e "${COLOR_GREEN}-----> $1${COLOR_REST}"
+}
+
+function echo_error_exit() {
+   echo -e "${COLOR_RED}$1${COLOR_REST}"
+   exit 1
+}
+
+function echo_stage() {
+   echo -e "${COLOR_PURPLE}----->  $1${COLOR_REST}"
+}
+
+echo_stage "Running finalize"
+
+export BUILD_PACK_DIR=$(dirname $(dirname $0))
+
+# creates a temp directory
+TMP_DIR=$(mktemp -d -t finalizeXXX)
+
+OPEN_JDK="OpenJDK8U-jdk_x64_linux_hotspot_8u212b04"
+MICRO_GATEWAY_TOOLKIT="wso2am-micro-gw-toolkit-3.0.1"
+WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
+PROJECT_NAME="cf-app"
+API_DEFINITIONS="api_definitions"
+
+echo_info "Unpacking Adopt Open JDK: ${OPEN_JDK}.tar.gz to  ${TMP_DIR}/${OPEN_JDK}"
+if ! mkdir -p ${TMP_DIR}/${OPEN_JDK};
+ then
+    echo_error_exit  "Couldn't create the directory ${TMP_DIR}/${OPEN_JDK}"
+fi
+
+if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${TMP_DIR}/${OPEN_JDK};
+ then
+  echo_error_exit  "Couldn't extract the JDK to ${TMP_DIR}/${OPEN_JDK}"
+fi
+
+# set JAVA_HOME for the Micro-gateway toolkit
+export JAVA_HOME="${TMP_DIR}/${OPEN_JDK}/jdk8u212-b04"
+
+echo_info "Unzipping Micro gateway toolkit"
+if ! unzip -q -d ${TMP_DIR} ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip;
+ then
+   echo_error_exit "Unable to unzip Micro gateway runtime: ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip"
+fi
+
+# add toolkit to the path
+export PATH="$PATH:${TMP_DIR}/${MICRO_GATEWAY_TOOLKIT}/bin/"
+
+echo_info "Initializing the project ${PROJECT_NAME}"
+if ! micro-gw init ${PROJECT_NAME} > /dev/null 2>&1;
+ then
+  echo_error_exit "Couldn't init the project ${PROJECT_NAME}"
+fi
+
+if ! cp ${APP_DIR}/${API_DEFINITIONS}/*.yaml $(pwd)/${PROJECT_NAME}/api_definitions/;
+ then
+  echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/${API_DEFINITIONS}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
+fi
+
+echo_info "Building the project ${PROJECT_NAME}"
+if ! micro-gw build ${PROJECT_NAME} > /dev/null 2>&1;
+ then
+  echo_error_exit "Couldn't build the project ${PROJECT_NAME}"
+fi
+
+echo_info "Coping the ballerina service to the ${APP_DIR}/"
+if ! cp $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx ${APP_DIR}/;
+ then
+  echo_error_exit "Couldn't copy Ballerina service $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx to ${APP_DIR}/"
+fi
+
+echo_info "Creating the directory ${APP_DIR}/.profile.d"
+if ! mkdir -p ${APP_DIR}/.profile.d;
+ then
+    echo_error_exit "Couldn't create the directory ${APP_DIR}/.profile.d"
+fi
+
+echo_info "Setting up environment variables"
+if ! echo "export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/"" >> "${APP_DIR}/.profile.d/env";
+ then
+    echo_error_exit "Couldn't configure the env in ${APP_DIR}/.profile.d"
+fi

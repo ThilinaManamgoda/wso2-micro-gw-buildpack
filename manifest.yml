@@ -1,0 +1,13 @@
+---
+language: wso2-am-micro-gw
+default_versions: []
+dependencies: []
+include_files:
+  - bin/detect
+  - bin/finalize
+  - bin/release
+  - bin/supply
+  - resources/wso2am-micro-gw-linux-3.0.1.zip
+  - resources/wso2am-micro-gw-toolkit-3.0.1.zip
+  - resources/OpenJDK8U-jdk_x64_linux_hotspot_8u212b04.tar.gz
+  - manifest.yml
