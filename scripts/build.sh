@@ -50,12 +50,12 @@ if [[ ! -f "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTI
     echo_error_exit "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip is not available"
 fi
 
-if ! unzip ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip; then
+if ! unzip -q ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip; then
     echo_error_exit "Couldn't unzip the ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip"
 fi
 
 pushd ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}
-    if ! unzip runtime.zip -d runtime;
+    if ! unzip -q runtime.zip -d runtime;
      then
         echo_error_exit "Couldn't unzip the ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime.zip"
     fi
