@@ -20,6 +20,6 @@ APP_DIR=$1
 PROJECT_NAME="cf-app"
 
 echo "default_process_types:"
-echo "  web: cat /home/vcap/app/.profile.d/env && gateway -e listenerConfig.httpPort=\${PORT} /home/vcap/app/${PROJECT_NAME}.balx"
+echo "  web: gateway -e listenerConfig.httpPort=\${PORT} /home/vcap/app/${PROJECT_NAME}.balx"
 
 

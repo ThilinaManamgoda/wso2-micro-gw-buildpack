@@ -42,8 +42,6 @@ function echo_stage() {
    echo -e "${COLOR_PURPLE}----->  $1${COLOR_REST}"
 }
 
-echo_stage "Running finalize"
-
 export BUILD_PACK_DIR=$(dirname $(dirname $0))
 
 # creates a temp directory
@@ -55,61 +53,61 @@ WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
 PROJECT_NAME="cf-app"
 API_DEFINITIONS="api_definitions"
 
+# Setup JDK for Toolkit
+function setup_jdk() {
+    echo_info "Unpacking Adopt Open JDK: ${OPEN_JDK}.tar.gz to  ${TMP_DIR}/${OPEN_JDK}"
+    if ! mkdir -p ${TMP_DIR}/${OPEN_JDK};
+     then
+        echo_error_exit  "Couldn't create the directory ${TMP_DIR}/${OPEN_JDK}"
+    fi
 
+    if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${TMP_DIR}/${OPEN_JDK};
+     then
+      echo_error_exit  "Couldn't extract the JDK to ${TMP_DIR}/${OPEN_JDK}"
+    fi
 
-echo_info "Unpacking Adopt Open JDK: ${OPEN_JDK}.tar.gz to  ${TMP_DIR}/${OPEN_JDK}"
-if ! mkdir -p ${TMP_DIR}/${OPEN_JDK};
- then
-    echo_error_exit  "Couldn't create the directory ${TMP_DIR}/${OPEN_JDK}"
-fi
+    # set JAVA_HOME for the Micro-gateway toolkit
+    export JAVA_HOME="${TMP_DIR}/${OPEN_JDK}/jdk8u212-b04"
+}
 
-if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${TMP_DIR}/${OPEN_JDK};
- then
-  echo_error_exit  "Couldn't extract the JDK to ${TMP_DIR}/${OPEN_JDK}"
-fi
+function setup_toolkit() {
+    echo_info "Unzipping Micro gateway toolkit"
+    if ! unzip -q -d ${TMP_DIR} ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip;
+     then
+       echo_error_exit "Unable to unzip Micro gateway runtime: ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip"
+    fi
 
-# set JAVA_HOME for the Micro-gateway toolkit
-export JAVA_HOME="${TMP_DIR}/${OPEN_JDK}/jdk8u212-b04"
+    # add toolkit to the path
+    export PATH="$PATH:${TMP_DIR}/${MICRO_GATEWAY_TOOLKIT}/bin/"
+}
 
-echo_info "Unzipping Micro gateway toolkit"
-if ! unzip -q -d ${TMP_DIR} ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip;
- then
-   echo_error_exit "Unable to unzip Micro gateway runtime: ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip"
-fi
+function initialize_project() {
+    echo_info "Initializing the project ${PROJECT_NAME}"
+    if ! micro-gw init ${PROJECT_NAME} > /dev/null 2>&1;
+     then
+      echo_error_exit "Couldn't init the project ${PROJECT_NAME}"
+    fi
+}
 
-# add toolkit to the path
-export PATH="$PATH:${TMP_DIR}/${MICRO_GATEWAY_TOOLKIT}/bin/"
+function build_project() {
+    echo_info "Building the project ${PROJECT_NAME}"
+    if ! cp ${APP_DIR}/${API_DEFINITIONS}/*.yaml $(pwd)/${PROJECT_NAME}/api_definitions/;
+     then
+      echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/${API_DEFINITIONS}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
+    fi
+    if ! micro-gw build ${PROJECT_NAME} > /dev/null 2>&1;
+     then
+      echo_error_exit "Couldn't build the project ${PROJECT_NAME}"
+    fi
+}
 
-echo_info "Initializing the project ${PROJECT_NAME}"
-if ! micro-gw init ${PROJECT_NAME} > /dev/null 2>&1;
- then
-  echo_error_exit "Couldn't init the project ${PROJECT_NAME}"
-fi
-
-if ! cp ${APP_DIR}/${API_DEFINITIONS}/*.yaml $(pwd)/${PROJECT_NAME}/api_definitions/;
- then
-  echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/${API_DEFINITIONS}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
-fi
-
-echo_info "Building the project ${PROJECT_NAME}"
-if ! micro-gw build ${PROJECT_NAME} > /dev/null 2>&1;
- then
-  echo_error_exit "Couldn't build the project ${PROJECT_NAME}"
-fi
-
-echo_info "Coping the ballerina service to the ${APP_DIR}/"
-if ! cp $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx ${APP_DIR}/;
- then
-  echo_error_exit "Couldn't copy Ballerina service $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx to ${APP_DIR}/"
-fi
-
-echo_info "Creating the directory ${APP_DIR}/.profile.d"
-if ! mkdir -p ${APP_DIR}/.profile.d;
- then
-    echo_error_exit "Couldn't create the directory ${APP_DIR}/.profile.d"
-fi
-
-echo_info "Setting up environment variables"
+function configure_balx() {
+    echo_info "Coping the ballerina service to the ${APP_DIR}/"
+    if ! cp $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx ${APP_DIR}/;
+     then
+      echo_error_exit "Couldn't copy Ballerina service $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx to ${APP_DIR}/"
+    fi
+}
 
 function configure_env() {
     echo_info "config: $1"
@@ -118,78 +116,97 @@ function configure_env() {
     fi
 }
 
-configure_env "PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/""
+function set_envs() {
+    echo_info "Setting up environment variables"
 
-# debug log level
-LOG_LEVEL=""
+    echo_info "Creating the directory ${APP_DIR}/.profile.d"
+    if ! mkdir -p ${APP_DIR}/.profile.d;
+     then
+        echo_error_exit "Couldn't create the directory ${APP_DIR}/.profile.d"
+    fi
 
-# analytics configurations
-ANALYTICS_ENABLED=""
-ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS=""
-ANALYTICS_UPLOADING_ENDPOINT=""
-ANALYTICS_ROTATING_PERIOD=""
-ANALYTICS_USERNAME=""
-ANALYTICS_PASSWORD=""
-ANALYTICS_TASK_UPLOAD_FILES=""
+    configure_env "PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/""
 
-# key manager configurations
-KEY_MANAGER_SERVER_URL=""
-KEY_MANAGER_USERNAME=""
-KEY_MANAGER_PASSWORD=""
+    # debug log level
+    LOG_LEVEL=""
 
-# read parameters
-CONFIG_FILE=${APP_DIR}/wso2am-micro-gw.conf
+    # analytics configurations
+    ANALYTICS_ENABLED=""
+    ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS=""
+    ANALYTICS_UPLOADING_ENDPOINT=""
+    ANALYTICS_ROTATING_PERIOD=""
+    ANALYTICS_USERNAME=""
+    ANALYTICS_PASSWORD=""
+    ANALYTICS_TASK_UPLOAD_FILES=""
 
-if [[ -f "${CONFIG_FILE}" ]]; then
-    echo_info "Loading wso2am-micro-gw.conf"
-    source ${CONFIG_FILE}
-fi
+    # key manager configurations
+    KEY_MANAGER_SERVER_URL=""
+    KEY_MANAGER_USERNAME=""
+    KEY_MANAGER_PASSWORD=""
 
-# configure debug logs
-if [[ ! -z ${LOG_LEVEL} ]]; then
-    configure_env "b7a_log_level=${LOG_LEVEL}"
-fi
+    # read parameters
+    CONFIG_FILE=${APP_DIR}/wso2am-micro-gw.conf
 
-# configure analytics
-if [[ ! -z ${ANALYTICS_ENABLED} ]]; then
- configure_env "analytics_enable=${ANALYTICS_ENABLED}"
-fi
+    if [[ -f "${CONFIG_FILE}" ]]; then
+        echo_info "Loading wso2am-micro-gw.conf"
+        source ${CONFIG_FILE}
+    fi
 
-if [[ ! -z ${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS} ]]; then
- configure_env "analytics_uploadingTimeSpanInMillis=${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS}"
-fi
+    # configure debug logs
+    if [[ ! -z ${LOG_LEVEL} ]]; then
+        configure_env "b7a_log_level=${LOG_LEVEL}"
+    fi
 
-if [[ ! -z ${ANALYTICS_UPLOADING_ENDPOINT} ]]; then
- configure_env "analytics_uploadingEndpoint=\"${ANALYTICS_UPLOADING_ENDPOINT}\""
-fi
+    # configure analytics
+    if [[ ! -z ${ANALYTICS_ENABLED} ]]; then
+     configure_env "analytics_enable=${ANALYTICS_ENABLED}"
+    fi
 
-if [[ ! -z ${ANALYTICS_ROTATING_PERIOD} ]]; then
- configure_env "analytics_rotatingPeriod=${ANALYTICS_ROTATING_PERIOD}"
-fi
+    if [[ ! -z ${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS} ]]; then
+     configure_env "analytics_uploadingTimeSpanInMillis=${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS}"
+    fi
 
-if [[ ! -z ${ANALYTICS_USERNAME} ]]; then
- configure_env "analytics_username=${ANALYTICS_USERNAME}"
-fi
+    if [[ ! -z ${ANALYTICS_UPLOADING_ENDPOINT} ]]; then
+     configure_env "analytics_uploadingEndpoint=\"${ANALYTICS_UPLOADING_ENDPOINT}\""
+    fi
 
-if [[ ! -z ${ANALYTICS_PASSWORD} ]]; then
- configure_env "analytics_password=${ANALYTICS_PASSWORD}"
-fi
+    if [[ ! -z ${ANALYTICS_ROTATING_PERIOD} ]]; then
+     configure_env "analytics_rotatingPeriod=${ANALYTICS_ROTATING_PERIOD}"
+    fi
 
-if [[ ! -z ${ANALYTICS_TASK_UPLOAD_FILES} ]]; then
- configure_env "analytics_task_uploadFiles=${ANALYTICS_TASK_UPLOAD_FILES}"
-fi
+    if [[ ! -z ${ANALYTICS_USERNAME} ]]; then
+     configure_env "analytics_username=${ANALYTICS_USERNAME}"
+    fi
 
-# configure key manager
-if [[ ! -z ${KEY_MANAGER_SERVER_URL} ]]; then
- configure_env "keyManager_serverUrl=\"${KEY_MANAGER_SERVER_URL}\""
-fi
+    if [[ ! -z ${ANALYTICS_PASSWORD} ]]; then
+     configure_env "analytics_password=${ANALYTICS_PASSWORD}"
+    fi
 
-if [[ ! -z ${KEY_MANAGER_USERNAME} ]]; then
- configure_env "keyManager_username=${KEY_MANAGER_USERNAME}"
-fi
+    if [[ ! -z ${ANALYTICS_TASK_UPLOAD_FILES} ]]; then
+     configure_env "analytics_task_uploadFiles=${ANALYTICS_TASK_UPLOAD_FILES}"
+    fi
 
-if [[ ! -z ${KEY_MANAGER_PASSWORD} ]]; then
- configure_env "keyManager_password=${KEY_MANAGER_PASSWORD}"
-fi
+    # configure key manager
+    if [[ ! -z ${KEY_MANAGER_SERVER_URL} ]]; then
+     configure_env "keyManager_serverUrl=\"${KEY_MANAGER_SERVER_URL}\""
+    fi
 
+    if [[ ! -z ${KEY_MANAGER_USERNAME} ]]; then
+     configure_env "keyManager_username=${KEY_MANAGER_USERNAME}"
+    fi
 
+    if [[ ! -z ${KEY_MANAGER_PASSWORD} ]]; then
+     configure_env "keyManager_password=${KEY_MANAGER_PASSWORD}"
+    fi
+
+    configure_env "datacenterId=testmicro"
+}
+
+echo_stage "Running finalize"
+
+setup_jdk
+setup_toolkit
+initialize_project
+build_project
+configure_balx
+set_envs
