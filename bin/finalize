@@ -113,12 +113,12 @@ echo_info "Setting up environment variables"
 
 function configure_env() {
     echo_info "config: $1"
-    if ! echo "$1" >> "${APP_DIR}/.profile.d/env"; then
-        echo_error_exit "cannot configure env: $1"
+    if ! echo "export $1" >> "${APP_DIR}/.profile.d/env"; then
+        echo_error_exit "Couldn't configure env: $1"
     fi
 }
 
-configure_env "export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/""
+configure_env "PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/""
 
 # debug log level
 LOG_LEVEL=""
@@ -147,49 +147,49 @@ fi
 
 # configure debug logs
 if [[ ! -z ${LOG_LEVEL} ]]; then
-    configure_env "export b7a_log_level=${LOG_LEVEL}"
+    configure_env "b7a_log_level=${LOG_LEVEL}"
 fi
 
 # configure analytics
 if [[ ! -z ${ANALYTICS_ENABLED} ]]; then
- configure_env "export analytics_enable=${ANALYTICS_ENABLED}"
+ configure_env "analytics_enable=${ANALYTICS_ENABLED}"
 fi
 
 if [[ ! -z ${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS} ]]; then
- configure_env "export analytics_uploadingTimeSpanInMillis=${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS}"
+ configure_env "analytics_uploadingTimeSpanInMillis=${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS}"
 fi
 
 if [[ ! -z ${ANALYTICS_UPLOADING_ENDPOINT} ]]; then
- configure_env "export  analytics_uploadingEndpoint=\"${ANALYTICS_UPLOADING_ENDPOINT}\""
+ configure_env "analytics_uploadingEndpoint=\"${ANALYTICS_UPLOADING_ENDPOINT}\""
 fi
 
 if [[ ! -z ${ANALYTICS_ROTATING_PERIOD} ]]; then
- configure_env "export analytics_rotatingPeriod=${ANALYTICS_ROTATING_PERIOD}"
+ configure_env "analytics_rotatingPeriod=${ANALYTICS_ROTATING_PERIOD}"
 fi
 
 if [[ ! -z ${ANALYTICS_USERNAME} ]]; then
- configure_env "export  analytics_username=${ANALYTICS_USERNAME}"
+ configure_env "analytics_username=${ANALYTICS_USERNAME}"
 fi
 
 if [[ ! -z ${ANALYTICS_PASSWORD} ]]; then
- configure_env "export  analytics_password=${ANALYTICS_PASSWORD}"
+ configure_env "analytics_password=${ANALYTICS_PASSWORD}"
 fi
 
 if [[ ! -z ${ANALYTICS_TASK_UPLOAD_FILES} ]]; then
- configure_env "export  analytics_task_uploadFiles=${ANALYTICS_TASK_UPLOAD_FILES}"
+ configure_env "analytics_task_uploadFiles=${ANALYTICS_TASK_UPLOAD_FILES}"
 fi
 
 # configure key manager
 if [[ ! -z ${KEY_MANAGER_SERVER_URL} ]]; then
- configure_env "export  keyManager_serverUrl=\"${KEY_MANAGER_SERVER_URL}\""
+ configure_env "keyManager_serverUrl=\"${KEY_MANAGER_SERVER_URL}\""
 fi
 
 if [[ ! -z ${KEY_MANAGER_USERNAME} ]]; then
- configure_env "export  keyManager_username=${KEY_MANAGER_USERNAME}"
+ configure_env "keyManager_username=${KEY_MANAGER_USERNAME}"
 fi
 
 if [[ ! -z ${KEY_MANAGER_PASSWORD} ]]; then
- configure_env "export  keyManager_password=${KEY_MANAGER_PASSWORD}"
+ configure_env "keyManager_password=${KEY_MANAGER_PASSWORD}"
 fi
 
 
