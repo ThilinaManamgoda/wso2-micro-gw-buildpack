@@ -19,7 +19,46 @@
 APP_DIR=$1
 PROJECT_NAME="cf-app"
 
+# debug log level
+LOG_LEVEL=""
+
+# analytics configurations
+ANALYTICS_ENABLED=""
+ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS=""
+ANALYTICS_UPLOADING_ENDPOINT=""
+ANALYTICS_ROTATING_PERIOD=""
+ANALYTICS_USERNAME=""
+ANALYTICS_PASSWORD=""
+
+# key manager configurations
+KEY_MANAGER_SERVER_URL=""
+KEY_MANAGER_USERNAME=""
+KEY_MANAGER_PASSWORD=""
+
+# read parameters
+CONFIG_FILE=${APP_DIR}/wso2am-micro-gw.con
+test -f ${CONFIG_FILE} && source ${CONFIG_FILE}
+
+# concat all configs  to "ENVS"
+CONFIGS=""
+
+# configure debug logs
+test ! -z ${LOG_LEVEL} && CONFIGS="-e b7a.log.level=${LOG_LEVEL}"
+
+# configure key manager
+test ! -z ${ANALYTICS_ENABLED} && CONFIGS="${CONFIGS} -e analytics.enable=${ANALYTICS_ENABLED}"
+test ! -z ${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS} && CONFIGS="${CONFIGS} -e analytics.uploadingTimeSpanInMillis=${ANALYTICS_UPLOADING_TIME_SPAN_IN_MILLIS}"
+test ! -z ${ANALYTICS_UPLOADING_ENDPOINT} && CONFIGS="${CONFIGS} -e analytics.uploadingEndpoint=\"${ANALYTICS_UPLOADING_ENDPOINT}\""
+test ! -z ${ANALYTICS_ROTATING_PERIOD} && CONFIGS="${CONFIGS} -e analytics.rotatingPeriod=${ANALYTICS_ROTATING_PERIOD}"
+test ! -z ${ANALYTICS_USERNAME} && CONFIGS="${CONFIGS} -e analytics.username=${ANALYTICS_USERNAME}"
+test ! -z ${ANALYTICS_PASSWORD} && CONFIGS="${CONFIGS} -e analytics.password=${ANALYTICS_PASSWORD}"
+
+# configure key manager
+test ! -z ${KEY_MANAGER_SERVER_URL} && CONFIGS="${CONFIGS} -e keyManager.serverUrl=\"${KEY_MANAGER_SERVER_URL}\""
+test ! -z ${KEY_MANAGER_USERNAME} && CONFIGS="${CONFIGS} -e keyManager.username=${KEY_MANAGER_USERNAME}"
+test ! -z ${KEY_MANAGER_PASSWORD} && CONFIGS="${CONFIGS} -e keyManager.password=${KEY_MANAGER_PASSWORD}"
+
 echo "default_process_types:"
-echo "  web: cat /home/vcap/app/.profile.d/env && echo \$PATH && gateway -e listenerConfig.httpPort=\${PORT} /home/vcap/app/${PROJECT_NAME}.balx"
+echo "  web: ls -l /home/vcap/deps/0/wso2am-micro-gw-linux-3.0.1/ && echo \$PATH && gateway -e listenerConfig.httpPort=\${PORT} /home/vcap/app/${PROJECT_NAME}.balx"
 
 

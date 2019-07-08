@@ -31,13 +31,19 @@ function echo_error_exit() {
 }
 
 BUILD_SCRIPT_DIR=$(dirname $(dirname $0))
-JDK="OpenJDK8U-jdk_x64_linux_hotspot_8u212b04"
-WSO2_AM_GW_RUNTIME_VERSION="3.0.1"
-WSO2_AM_GW_TOOLKIT_VERSION="3.0.1"
-TRUST_STORE_PASSWORD="ballerina"
+JDK=""
+WSO2_AM_GW_RUNTIME_VERSION=""
+WSO2_AM_GW_TOOLKIT_VERSION=""
+TRUST_STORE_PASSWORD=""
+
+source ${BUILD_SCRIPT_DIR}/config
 
 if ! cp ${BUILD_SCRIPT_DIR}/../dist/${JDK}.tar.gz ${BUILD_SCRIPT_DIR}/../resources; then
     echo_error_exit "Couldn't copy ${BUILD_SCRIPT_DIR}/../dist/${JDK}.tar.gz to ${BUILD_SCRIPT_DIR}/../resources"
+fi
+
+if ! cp ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-toolkit-${WSO2_AM_GW_TOOLKIT_VERSION}.zip ${BUILD_SCRIPT_DIR}/../resources; then
+    echo_error_exit "Couldn't copy ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-toolkit-${WSO2_AM_GW_TOOLKIT_VERSION}.zip to ${BUILD_SCRIPT_DIR}/../resources"
 fi
 
 if [[ ! -f "${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip" ]]; then
@@ -48,47 +54,61 @@ if ! unzip ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIM
     echo_error_exit "Couldn't unzip the ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip"
 fi
 
-if ! mkdir runtime; then
-    echo_error_exit "Make directory runtime"
-fi
-
-if ! unzip -q ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime.zip -d runtime ;
- then
-    echo_error_exit "Couldn't unzip the ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip"
-fi
+pushd ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}
+    if ! unzip runtime.zip -d runtime;
+     then
+        echo_error_exit "Couldn't unzip the ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime.zip"
+    fi
+    if ! rm runtime.zip; then
+        echo_error_exit "Couldn't remove ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime.zip"
+    fi
+popd
 
 # import certificates for runtime
 for cert in "${BUILD_SCRIPT_DIR}/../dist/certs"/*
 do
   cert_file=$(basename -- "$cert")
   cert_name="${cert_file%.*}"
-  keytool -import -alias ${cert_name} -keystore ${BUILD_SCRIPT_DIR}/runtime/bre/security/ballerinaTruststore.p12 -file ${cert} -storepass ${TRUST_STORE_PASSWORD}  -noprompt
+  if ! keytool -import -alias ${cert_name} -keystore ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime/bre/security/ballerinaTruststore.p12 -file ${cert} -storepass ${TRUST_STORE_PASSWORD}  -noprompt;
+   then
+    echo_error_exit "Couldn't import the certificate: ${cert_file}"
+  fi
 done
 
-if ! zip -r runtime.zip runtime/*;
- then
-    echo_error_exit "couldn't package runtime/* to runtime.zip"
+pushd ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime
+    if ! zip -q -r runtime.zip .; then
+       echo_error_exit "Couldn't package runtime/* to runtime.zip"
+    fi
+popd
+
+if ! mv ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime/runtime.zip ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/; then
+  echo_error_exit "Couldn't move runtime.zip to ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/"
 fi
 
-if ! cp ${BUILD_SCRIPT_DIR}/runtime.zip wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/; then
-    echo_error_exit "Couldn't copy ${BUILD_SCRIPT_DIR}/runtime.zip to wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/"
+if ! rm -rf ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime; then
+  echo_error_exit "Couldn't remove ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime"
 fi
 
-if ! zip -r wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/*;
- then
-    echo_error_exit "couldn't package wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/* to wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip"
+pushd ${BUILD_SCRIPT_DIR}
+    if ! zip -q -r wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/*; then
+        echo_error_exit "Couldn't package wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/* to wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip"
+    fi
+popd
+
+if ! cp ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip ${BUILD_SCRIPT_DIR}/../resources; then
+    echo_error_exit "Couldn't copy ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip to ${BUILD_SCRIPT_DIR}/../resources"
 fi
 
-#if ! rm -rf wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}; then
-#    echo_error "couldn't remove wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}"
-#    exit 1
-#fi
+if ! rm -rf ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}; then
+    echo_error_exit "Couldn't remove ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}"
+fi
 
-if ! cp ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-toolkit-${WSO2_AM_GW_TOOLKIT_VERSION}.zip; then
-    echo_error_exit "Couldn't copy ${BUILD_SCRIPT_DIR}/../dist/wso2am-micro-gw-toolkit-${WSO2_AM_GW_TOOLKIT_VERSION}.zip"
+if ! rm  ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip; then
+    echo_error_exit "Couldn't remove ${BUILD_SCRIPT_DIR}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip"
 fi
 
 pushd ${BUILD_SCRIPT_DIR}/../
  if ! buildpack-packager build  -any-stack -cached; then
-  echo_error "couldn't build the Build pack"
+  echo_error_exit "Couldn't build the Build pack"
  fi
+popd

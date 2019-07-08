@@ -110,5 +110,5 @@ fi
 echo_info "Setting up environment variables"
 if ! echo "export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/"" >> "${APP_DIR}/.profile.d/env";
  then
-    echo_error_exit "Couldn't configure the env in ${APP_DIR}/.profile.d"
+    echo_error_exit "Couldn't configure the PATH env in ${APP_DIR}/.profile.d/env"
 fi
