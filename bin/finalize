@@ -29,23 +29,6 @@ COLOR_RED="\e[31m"
 COLOR_GREEN="\e[32m"
 COLOR_PURPLE="\e[35m"
 
-function echo_info() {
-   echo -e "${COLOR_GREEN}-----> $1${COLOR_REST}"
-}
-
-function echo_error_exit() {
-   echo -e "${COLOR_RED}$1${COLOR_REST}"
-   exit 1
-}
-
-function echo_stage() {
-   echo -e "${COLOR_PURPLE}----->  $1${COLOR_REST}"
-}
-
-export BUILD_PACK_DIR=$(dirname $(dirname $0))
-
-# creates a temp directory
-TMP_DIR=$(mktemp -d -t finalizeXXX)
 
 OPEN_JDK="OpenJDK8U-jdk_x64_linux_hotspot_8u212b04"
 MICRO_GATEWAY_TOOLKIT="wso2am-micro-gw-toolkit-3.0.2-SNAPSHOT"
@@ -53,16 +36,94 @@ WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
 PROJECT_NAME="cf-app"
 API_DEFINITIONS="api_definitions"
 
-# Setup JDK for Toolkit
+#######################################
+# Export current script directory
+# Globals:
+#   BUILD_PACK_DIR
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function set_build_directory() {
+    export BUILD_PACK_DIR=$(dirname $(dirname $0))
+}
+
+#######################################
+# Creates a temp directory
+# Globals:
+#   TMP_DIR
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function create_tmp_dir() {
+    TMP_DIR=$(mktemp -d -t finalizeXXX)
+}
+
+#######################################
+# Logs information in Green colour
+# Globals:
+#   COLOR_GREEN
+#   COLOR_REST
+# Arguments:
+#   Info message
+# Returns:
+#   None
+#######################################
+function echo_info() {
+   echo -e "${COLOR_GREEN}-----> $1${COLOR_REST}"
+}
+
+#######################################
+# Logs error and exit with code 1 in
+# Red colour
+# Globals:
+#   COLOR_RED
+#   COLOR_REST
+# Arguments:
+#   Error message
+# Returns:
+#   None
+#######################################
+function echo_error_exit() {
+   echo -e "${COLOR_RED}$1${COLOR_REST}"
+   exit 1
+}
+
+#######################################
+# Logs Stage in Purple colour
+# Globals:
+#   COLOR_PURPLE
+#   COLOR_REST
+# Arguments:
+#   Stage message
+# Returns:
+#   None
+#######################################
+function echo_stage() {
+   echo -e "${COLOR_PURPLE}----->  $1${COLOR_REST}"
+}
+
+#######################################
+# Setup JDK
+# Globals:
+#   OPEN_JDK
+#   TMP_DIR
+#   BUILD_PACK_DIR
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function setup_jdk() {
     echo_info "Unpacking Adopt Open JDK: ${OPEN_JDK}.tar.gz to  ${TMP_DIR}/${OPEN_JDK}"
-    if ! mkdir -p ${TMP_DIR}/${OPEN_JDK};
-     then
+    if ! mkdir -p ${TMP_DIR}/${OPEN_JDK}; then
         echo_error_exit  "Couldn't create the directory ${TMP_DIR}/${OPEN_JDK}"
     fi
 
-    if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${TMP_DIR}/${OPEN_JDK};
-     then
+    if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${TMP_DIR}/${OPEN_JDK}; then
       echo_error_exit  "Couldn't extract the JDK to ${TMP_DIR}/${OPEN_JDK}"
     fi
 
@@ -70,10 +131,21 @@ function setup_jdk() {
     export JAVA_HOME="${TMP_DIR}/${OPEN_JDK}/jdk8u212-b04"
 }
 
+#######################################
+# Setup Micro-gateway Toolkit
+# Globals:
+#   TMP_DIR
+#   BUILD_PACK_DIR
+#   MICRO_GATEWAY_TOOLKIT
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function setup_toolkit() {
+    setup_jdk
     echo_info "Unzipping Micro gateway toolkit"
-    if ! unzip -q -d ${TMP_DIR} ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip;
-     then
+    if ! unzip -q -d ${TMP_DIR} ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip; then
        echo_error_exit "Unable to unzip Micro gateway runtime: ${BUILD_PACK_DIR}/resources/${MICRO_GATEWAY_TOOLKIT}.zip"
     fi
 
@@ -81,41 +153,72 @@ function setup_toolkit() {
     export PATH="$PATH:${TMP_DIR}/${MICRO_GATEWAY_TOOLKIT}/bin/"
 }
 
+#######################################
+# Initialize the Micro-gateway project
+# Globals:
+#   PROJECT_NAME
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function initialize_project() {
     echo_info "Initializing the project ${PROJECT_NAME}"
-    if ! micro-gw init ${PROJECT_NAME} > /dev/null 2>&1;
-     then
+    if ! micro-gw init ${PROJECT_NAME} > /dev/null 2>&1; then
       echo_error_exit "Couldn't init the project ${PROJECT_NAME}"
     fi
 }
 
+#######################################
+# Build the Micro-gateway project
+# Globals:
+#   PROJECT_NAME
+#   APP_DIR
+#   API_DEFINITIONS
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function build_project() {
     echo_info "Building the project ${PROJECT_NAME}"
-    if ! cp ${APP_DIR}/${API_DEFINITIONS}/*.yaml $(pwd)/${PROJECT_NAME}/api_definitions/;
-     then
+    if ! cp ${APP_DIR}/${API_DEFINITIONS}/*.yaml $(pwd)/${PROJECT_NAME}/api_definitions/; then
       echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/${API_DEFINITIONS}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
     fi
-    if ! micro-gw build ${PROJECT_NAME} > /dev/null 2>&1;
-     then
+    if ! micro-gw build ${PROJECT_NAME} > /dev/null 2>&1; then
       echo_error_exit "Couldn't build the project ${PROJECT_NAME}"
     fi
 }
 
-function configure_balx() {
+#################################################
+# Copy the ballerina service to the app directory
+# Globals:
+#   BACKUP_DIR
+# Arguments:
+#   None
+# Returns:
+#   None
+#################################################
+function configure_ballerina_service() {
     echo_info "Coping the ballerina service to the ${APP_DIR}/"
-    if ! cp $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx ${APP_DIR}/;
-     then
+    if ! cp $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx ${APP_DIR}/; then
       echo_error_exit "Couldn't copy Ballerina service $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx to ${APP_DIR}/"
     fi
 }
 
-
+#######################################
+# Add Micro-gateway runtime to the $PATH
+# Globals:
+#   APP_DIR
+#   DEPS_IDX
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
 function set_gateway_runtime_path() {
     echo_info "Setting up environment variables"
-
-    echo_info "Creating the directory ${APP_DIR}/.profile.d"
-    if ! mkdir -p ${APP_DIR}/.profile.d;
-     then
+    if ! mkdir -p ${APP_DIR}/.profile.d; then
         echo_error_exit "Couldn't create the directory ${APP_DIR}/.profile.d"
     fi
 
@@ -124,11 +227,15 @@ function set_gateway_runtime_path() {
     fi
 }
 
-echo_stage "Running finalize"
+function main() {
+    echo_stage "Running finalize"
+    set_build_directory
+    create_tmp_dir
+    setup_toolkit
+    initialize_project
+    build_project
+    configure_ballerina_service
+    set_gateway_runtime_path
+}
 
-setup_jdk
-setup_toolkit
-initialize_project
-build_project
-configure_balx
-set_gateway_runtime_path
+main "$@"

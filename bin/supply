@@ -29,55 +29,144 @@ COLOR_RED="\e[31m"
 COLOR_GREEN="\e[32m"
 COLOR_PURPLE="\e[35m"
 
+WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
+
+#######################################
+# Logs information in Green colour
+# Globals:
+#   COLOR_GREEN
+#   COLOR_REST
+# Arguments:
+#   Info message
+# Returns:
+#   None
+#######################################
 function echo_info() {
    echo -e "${COLOR_GREEN}-----> $1${COLOR_REST}"
 }
 
+#######################################
+# Logs error and exit with code 1 in
+# Red colour
+# Globals:
+#   COLOR_RED
+#   COLOR_REST
+# Arguments:
+#   Error message
+# Returns:
+#   None
+#######################################
 function echo_error_exit() {
    echo -e "${COLOR_RED}$1${COLOR_REST}"
    exit 1
 }
 
+#######################################
+# Logs Stage in Purple colour
+# Globals:
+#   COLOR_PURPLE
+#   COLOR_REST
+# Arguments:
+#   Stage message
+# Returns:
+#   None
+#######################################
 function echo_stage() {
    echo -e "${COLOR_PURPLE}-----> $1${COLOR_REST}"
 }
 
-echo_stage "Running supply"
+#######################################
+# Export current script directory
+# Globals:
+#   BUILD_PACK_DIR
+# Arguments:
+#   None
+# Returns:
+#   None
+#######################################
+function set_build_directory() {
+    export BUILD_PACK_DIR=$(dirname $(dirname $0))
+}
 
-export BUILD_PACK_DIR=$(dirname $(dirname $0))
-WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
+#################################################
+# Configure Micro-gateway runtime as a dependency
+# Globals:
+#   BUILD_PACK_DIR
+#   DEPS_DIR
+#   DEPS_IDX
+#   WSO2_AM_GW_RUNTIME
+# Arguments:
+#   None
+# Returns:
+#   None
+################################################
+function configure_micro_gateway() {
+    echo_info "Creating ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME} directory"
+    #  creates a directory for storing deps
+    if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME};
+     then
+        echo_error_exit  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}"
+        exit 1
+    fi
+    echo_info "Unzipping Micro gateway runtime"
+    if ! unzip -q -d ${DEPS_DIR}/${DEPS_IDX} ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_RUNTIME}.zip;
+     then
+       echo_error_exit "Unable to unzip Micro gateway runtime zip: ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_RUNTIME}.zip"
+       exit 1
+    fi
+}
 
-echo_info "Creating ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME} directory"
-#  creates a directory for storing deps
-if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME};
- then
-    echo_error_exit  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}"
-    exit 1
-fi
+##########################################################
+# Set Micro-gateway runtime PATH for subsequent build-packs
+# Globals:
+#   DEPS_DIR
+#   DEPS_IDX
+#   WSO2_AM_GW_RUNTIME
+# Arguments:
+#   None
+# Returns:
+#   None
+##########################################################
+function set_gateway_runtime_path() {
+    echo_info "Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+    if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
+     then
+        echo_error_exit  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
+        exit 1
+    fi
 
-echo_info "Unzipping Micro gateway runtime"
-if ! unzip -q -d ${DEPS_DIR}/${DEPS_IDX} ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_RUNTIME}.zip;
- then
-   echo_error_exit "Unable to unzip Micro gateway runtime zip: ${BUILD_PACK_DIR}/resources/${WSO2_AM_GW_RUNTIME}.zip"
-   exit 1
-fi
+    if ! echo "export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/"" >> "${DEPS_DIR}/${DEPS_IDX}/profile.d/env"; then
+        echo_error_exit "Couldn't runtime path to ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+    fi
+}
 
+#################################################
+# Creates the build-pack communication contract
+# Globals:
+#   DEPS_DIR
+#   DEPS_IDX
+# Arguments:
+#   None
+# Returns:
+#   None
+################################################
+function create_buildpack_communication_contract() {
 echo_info "Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml
 ---
 config:
-  MicroGatewayRuntime: 3.0.0
-name: wso2-am-micro-gw
+  MicroGatewayRuntime: 3.0.1
+name: wso2am-micro-gw
 version: 1.0.0
 EOF
+ set_gateway_runtime_path
+}
 
-echo_info "Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
-if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
- then
-    echo_error_exit  "Couldn't create the directory ${DEPS_DIR}/${DEPS_IDX}/profile.d"
-    exit 1
-fi
+function main() {
+    echo_stage "Running supply"
+    set_build_directory
+    configure_micro_gateway
+    create_buildpack_communication_contract
+}
 
-cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/profile.d/env
-export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/"
-EOF
+main "$@"

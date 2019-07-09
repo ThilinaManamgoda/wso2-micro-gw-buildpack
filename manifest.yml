@@ -1,5 +1,5 @@
 ---
-language: wso2-am-micro-gw
+language: wso2am-micro-gw
 default_versions: []
 dependencies: []
 include_files:
