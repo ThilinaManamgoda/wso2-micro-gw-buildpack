@@ -19,14 +19,11 @@
 # application root directory should contain the configuration file "wso2-am-gw"
 APP_DIR=${1}
 
-
-echo $APP_DIR
 for file in ${APP_DIR}/*
    do
     if [[ ! -f $file ]]; then
        exit 1
     fi
-    echo $file
     filename=$(basename -- "$file")
     extension="${filename##*.}"
     if ! { [[ "${extension}" = "yml" ]] || [[ "${extension}" = "yaml" ]] || [[ "${extension}" = "json" ]]; }; then
@@ -42,7 +39,6 @@ for file in ${APP_DIR}/*
     if ! grep -e "x-wso2-production-endpoints:" $file > /dev/null 2>&1; then
        exit 1
     fi
-
 done
 
 exit 0
