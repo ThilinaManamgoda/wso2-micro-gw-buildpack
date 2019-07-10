@@ -34,7 +34,6 @@ OPEN_JDK="OpenJDK8U-jdk_x64_linux_hotspot_8u212b04"
 MICRO_GATEWAY_TOOLKIT="wso2am-micro-gw-toolkit-3.0.2-SNAPSHOT"
 WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
 PROJECT_NAME="cf-app"
-API_DEFINITIONS="api_definitions"
 
 #######################################
 # Export current script directory
@@ -107,7 +106,7 @@ function echo_stage() {
 }
 
 #######################################
-# Setup JDK
+# Configure JDK
 # Globals:
 #   OPEN_JDK
 #   TMP_DIR
@@ -118,7 +117,7 @@ function echo_stage() {
 #   None
 #######################################
 function setup_jdk() {
-    echo_info "Unpacking Adopt Open JDK: ${OPEN_JDK}.tar.gz to  ${TMP_DIR}/${OPEN_JDK}"
+    echo_info "Unzipping Adopt Open JDK: ${OPEN_JDK}.tar.gz to  ${TMP_DIR}/${OPEN_JDK}"
     if ! mkdir -p ${TMP_DIR}/${OPEN_JDK}; then
         echo_error_exit  "Couldn't create the directory ${TMP_DIR}/${OPEN_JDK}"
     fi
@@ -127,7 +126,7 @@ function setup_jdk() {
       echo_error_exit  "Couldn't extract the JDK to ${TMP_DIR}/${OPEN_JDK}"
     fi
 
-    # set JAVA_HOME for the Micro-gateway toolkit
+    # set JAVA_HOME
     export JAVA_HOME="${TMP_DIR}/${OPEN_JDK}/jdk8u212-b04"
 }
 
@@ -170,7 +169,7 @@ function initialize_project() {
 }
 
 #######################################
-# Build the Micro-gateway project
+# Copy Swagger definitions from the $APP_DIR and Build the Micro-gateway project
 # Globals:
 #   PROJECT_NAME
 #   APP_DIR
@@ -182,8 +181,8 @@ function initialize_project() {
 #######################################
 function build_project() {
     echo_info "Building the project ${PROJECT_NAME}"
-    if ! cp ${APP_DIR}/${API_DEFINITIONS}/*.yaml $(pwd)/${PROJECT_NAME}/api_definitions/; then
-      echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/${API_DEFINITIONS}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
+    if ! cp ${APP_DIR}/* $(pwd)/${PROJECT_NAME}/api_definitions/; then
+      echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
     fi
     if ! micro-gw build ${PROJECT_NAME} > /dev/null 2>&1; then
       echo_error_exit "Couldn't build the project ${PROJECT_NAME}"
@@ -194,6 +193,8 @@ function build_project() {
 # Copy the ballerina service to the app directory
 # Globals:
 #   BACKUP_DIR
+#   PROJECT_NAME
+#   APP_DIR
 # Arguments:
 #   None
 # Returns:
@@ -211,13 +212,14 @@ function configure_ballerina_service() {
 # Globals:
 #   APP_DIR
 #   DEPS_IDX
+#   WSO2_AM_GW_RUNTIME
 # Arguments:
 #   None
 # Returns:
 #   None
 #######################################
 function set_gateway_runtime_path() {
-    echo_info "Setting up environment variables"
+    echo_info "Setting up Gateway runtime path"
     if ! mkdir -p ${APP_DIR}/.profile.d; then
         echo_error_exit "Couldn't create the directory ${APP_DIR}/.profile.d"
     fi

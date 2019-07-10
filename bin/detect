@@ -18,8 +18,31 @@
 
 # application root directory should contain the configuration file "wso2-am-gw"
 APP_DIR=${1}
-if [[ -d "${APP_DIR}/api_definitions" ]]; then
-  exit 0
-fi
 
-exit 1
+
+echo $APP_DIR
+for file in ${APP_DIR}/*
+   do
+    if [[ ! -f $file ]]; then
+       exit 1
+    fi
+    echo $file
+    filename=$(basename -- "$file")
+    extension="${filename##*.}"
+    if ! { [[ "${extension}" = "yml" ]] || [[ "${extension}" = "yaml" ]] || [[ "${extension}" = "json" ]]; }; then
+      exit 1
+    fi
+
+    if ! grep -e "openapi:\|swagger:" $file > /dev/null 2>&1; then
+      exit 1
+    fi
+    if ! grep -e "x-wso2-basePath" $file > /dev/null 2>&1 ; then
+       exit 1
+    fi
+    if ! grep -e "x-wso2-production-endpoints:" $file > /dev/null 2>&1; then
+       exit 1
+    fi
+
+done
+
+exit 0
