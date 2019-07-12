@@ -29,10 +29,13 @@ COLOR_RED="\e[31m"
 COLOR_GREEN="\e[32m"
 COLOR_PURPLE="\e[35m"
 
+OPEN_JDK_VERSION="8u212b04"
+MICRO_GATEWAY_TOOLKIT_VERSION="3.0.2-SNAPSHOT"
+WSO2_AM_GW_RUNTIME_VERSION="3.0.1"
 
-OPEN_JDK="OpenJDK8U-jdk_x64_linux_hotspot_8u212b04"
-MICRO_GATEWAY_TOOLKIT="wso2am-micro-gw-toolkit-3.0.2-SNAPSHOT"
-WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-3.0.1"
+OPEN_JDK="OpenJDK8U-jdk_x64_linux_hotspot_${OPEN_JDK_VERSION}"
+MICRO_GATEWAY_TOOLKIT="wso2am-micro-gw-toolkit-${MICRO_GATEWAY_TOOLKIT_VERSION}"
+WSO2_AM_GW_RUNTIME="wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}"
 PROJECT_NAME="cf-app"
 
 #######################################
@@ -122,12 +125,12 @@ function setup_jdk() {
         echo_error_exit  "Couldn't create the directory ${TMP_DIR}/${OPEN_JDK}"
     fi
 
-    if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${TMP_DIR}/${OPEN_JDK}; then
+    if ! tar -xf ${BUILD_PACK_DIR}/resources/${OPEN_JDK}.tar.gz -C ${TMP_DIR}/${OPEN_JDK} --strip 1; then
       echo_error_exit  "Couldn't extract the JDK to ${TMP_DIR}/${OPEN_JDK}"
     fi
 
     # set JAVA_HOME
-    export JAVA_HOME="${TMP_DIR}/${OPEN_JDK}/jdk8u212-b04"
+    export JAVA_HOME="${TMP_DIR}/${OPEN_JDK}/"
 }
 
 #######################################
@@ -163,8 +166,8 @@ function setup_toolkit() {
 #######################################
 function initialize_project() {
     echo_info "Initializing the project ${PROJECT_NAME}"
-    if ! micro-gw init ${PROJECT_NAME} > /dev/null 2>&1; then
-      echo_error_exit "Couldn't init the project ${PROJECT_NAME}"
+    if ! err=$(micro-gw init ${PROJECT_NAME} 2>&1); then
+      echo_error_exit "Couldn't init the project ${PROJECT_NAME}. Error: ${err}"
     fi
 }
 
@@ -184,8 +187,8 @@ function build_project() {
     if ! cp ${APP_DIR}/* $(pwd)/${PROJECT_NAME}/api_definitions/; then
       echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
     fi
-    if ! micro-gw build ${PROJECT_NAME} > /dev/null 2>&1; then
-      echo_error_exit "Couldn't build the project ${PROJECT_NAME}"
+    if ! err=$(micro-gw build ${PROJECT_NAME} 2>&1); then
+      echo_error_exit "Couldn't build the project ${PROJECT_NAME}. Error: ${err}"
     fi
 }
 
@@ -240,4 +243,4 @@ function main() {
     set_gateway_runtime_path
 }
 
-main "$@"
+main

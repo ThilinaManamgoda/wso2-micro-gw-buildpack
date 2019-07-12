@@ -169,4 +169,4 @@ function main() {
     create_buildpack_communication_contract
 }
 
-main "$@"
+main
