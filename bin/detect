@@ -16,7 +16,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# application root directory should contain the configuration file "wso2-am-gw"
+# Detect the Swagger definitions based on following conditions,
+# 1. File extension must be ".yaml" or ".json"
+# 2. Each definitions should contain "openapi:" or "swagger:" attributes
+# 3. Each definitions should contain  "x-wso2-basePath" attribute
+# 4. Each definitions should contain  "x-wso2-production-endpoints:" attribute
 APP_DIR=${1}
 
 for file in ${APP_DIR}/*
@@ -26,14 +30,14 @@ for file in ${APP_DIR}/*
     fi
     filename=$(basename -- "${file}")
     extension="${filename##*.}"
-    if ! { [[ "${extension}" = "yml" ]] || [[ "${extension}" = "yaml" ]] || [[ "${extension}" = "json" ]]; }; then
+    if ! { [[ "${extension}" = "yaml" ]] || [[ "${extension}" = "json" ]]; }; then
       exit 1
     fi
 
     if ! grep -e "openapi:\|swagger:" ${file} > /dev/null 2>&1; then
       exit 1
     fi
-    if ! grep -e "x-wso2-basePath" ${file} > /dev/null 2>&1 ; then
+    if ! grep -e "x-wso2-basePath:" ${file} > /dev/null 2>&1 ; then
        exit 1
     fi
     if ! grep -e "x-wso2-production-endpoints:" ${file} > /dev/null 2>&1; then
