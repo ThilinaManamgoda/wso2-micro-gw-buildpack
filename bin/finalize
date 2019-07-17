@@ -120,7 +120,7 @@ function echo_stage() {
 #   None
 #######################################
 function setup_jdk() {
-    echo_info "Unzipping Adopt Open JDK: ${OPEN_JDK}.tar.gz to  ${TMP_DIR}/${OPEN_JDK}"
+    echo_info "Setting up Adopt Open JDK: ${OPEN_JDK}"
     if ! mkdir -p ${TMP_DIR}/${OPEN_JDK}; then
         echo_error_exit  "Couldn't create the directory ${TMP_DIR}/${OPEN_JDK}"
     fi
@@ -171,8 +171,8 @@ function initialize_project() {
     fi
 }
 
-#######################################
-# Copy Swagger definitions from the $APP_DIR and Build the Micro-gateway project
+#################################################################################
+# Copy artifacts from the $APP_DIR to Toolkit and Build the Micro-gateway project
 # Globals:
 #   PROJECT_NAME
 #   APP_DIR
@@ -181,12 +181,20 @@ function initialize_project() {
 #   None
 # Returns:
 #   None
-#######################################
+#################################################################################
 function build_project() {
     echo_info "Building the project ${PROJECT_NAME}"
-    if ! cp ${APP_DIR}/* $(pwd)/${PROJECT_NAME}/api_definitions/; then
+    if ! find ${APP_DIR}/ -type f -exec cp "{}" $(pwd)/${PROJECT_NAME}/api_definitions/ \;; then
       echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
     fi
+
+    if [[ -d ${APP_DIR}/interceptors ]]; then
+        echo_info "Copying interceptors"
+        if ! find ${APP_DIR}/interceptors/ -type f -exec cp "{}" $(pwd)/${PROJECT_NAME}/interceptors/ \;; then
+         echo_error_exit "Couldn't copy interceptors from ${APP_DIR}/interceptors to $(pwd)/${PROJECT_NAME}/interceptors/"
+        fi
+    fi
+
     if ! err=$(micro-gw build ${PROJECT_NAME} 2>&1); then
       echo_error_exit "Couldn't build the project ${PROJECT_NAME}. Error: ${err}"
     fi
@@ -204,7 +212,7 @@ function build_project() {
 #   None
 #################################################
 function configure_ballerina_service() {
-    echo_info "Coping the ballerina service to the ${APP_DIR}/"
+    echo_info "Copying the ballerina service to the ${APP_DIR}/"
     if ! cp $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx ${APP_DIR}/; then
       echo_error_exit "Couldn't copy Ballerina service $(pwd)/${PROJECT_NAME}/target/${PROJECT_NAME}.balx to ${APP_DIR}/"
     fi
@@ -228,7 +236,7 @@ function set_gateway_runtime_path() {
     fi
 
     if ! echo "export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/"" >> "${APP_DIR}/.profile.d/env"; then
-        echo_error_exit "Couldn't configure env: $1"
+        echo_error_exit "Couldn't configureMicro-gateway runtime path"
     fi
 }
 

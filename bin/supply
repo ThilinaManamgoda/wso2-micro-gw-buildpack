@@ -116,7 +116,7 @@ function configure_micro_gateway() {
     fi
 }
 
-##########################################################
+###########################################################
 # Set Micro-gateway runtime PATH for subsequent build-packs
 # Globals:
 #   DEPS_DIR
@@ -126,7 +126,7 @@ function configure_micro_gateway() {
 #   None
 # Returns:
 #   None
-##########################################################
+###########################################################
 function set_gateway_runtime_path() {
     echo_info "Creating ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
     if ! mkdir -p ${DEPS_DIR}/${DEPS_IDX}/profile.d;
@@ -136,12 +136,12 @@ function set_gateway_runtime_path() {
     fi
 
     if ! echo "export PATH="\$PATH:/home/vcap/deps/${DEPS_IDX}/${WSO2_AM_GW_RUNTIME}/bin/"" >> "${DEPS_DIR}/${DEPS_IDX}/profile.d/env"; then
-        echo_error_exit "Couldn't runtime path to ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
+        echo_error_exit "Couldn't Micro-gateway runtime path to ${DEPS_DIR}/${DEPS_IDX}/profile.d/env"
     fi
 }
 
-#################################################
-# Creates the build-pack communication contract
+####################################################
+# Creates the core build-pack communication contract
 # Globals:
 #   DEPS_DIR
 #   DEPS_IDX
@@ -149,7 +149,7 @@ function set_gateway_runtime_path() {
 #   None
 # Returns:
 #   None
-################################################
+####################################################
 function create_buildpack_communication_contract() {
 echo_info "Creating  ${DEPS_DIR}/${DEPS_IDX}/config.yml"
 cat << EOF > ${DEPS_DIR}/${DEPS_IDX}/config.yml

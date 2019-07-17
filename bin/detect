@@ -25,24 +25,27 @@ APP_DIR=${1}
 
 for file in ${APP_DIR}/*
    do
-    if [[ ! -f ${file} ]]; then
-       exit 1
-    fi
     filename=$(basename -- "${file}")
-    extension="${filename##*.}"
-    if ! { [[ "${extension}" = "yaml" ]] || [[ "${extension}" = "json" ]]; }; then
-      exit 1
-    fi
+    if [[ -d ${file} ]]; then
+        if [[ ${filename} != "interceptors" ]]; then
+            exit 1
+        fi
+      else
+        extension="${filename##*.}"
+        if ! { [[ "${extension}" = "yaml" ]] || [[ "${extension}" = "json" ]]; }; then
+          exit 1
+        fi
 
-    if ! grep -e "openapi:\|swagger:" ${file} > /dev/null 2>&1; then
-      exit 1
-    fi
-    if ! grep -e "x-wso2-basePath:" ${file} > /dev/null 2>&1 ; then
-       exit 1
-    fi
-    if ! grep -e "x-wso2-production-endpoints:" ${file} > /dev/null 2>&1; then
-       exit 1
-    fi
+        if ! grep -e "openapi:\|swagger:" ${file} > /dev/null 2>&1; then
+          exit 1
+        fi
+        if ! grep -e "x-wso2-basePath:" ${file} > /dev/null 2>&1 ; then
+           exit 1
+        fi
+        if ! grep -e "x-wso2-production-endpoints:" ${file} > /dev/null 2>&1; then
+           exit 1
+        fi
+        fi
 done
 
 exit 0
