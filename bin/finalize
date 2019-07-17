@@ -16,6 +16,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
+##################################################################################
+# The flow of this script is as below,
+# 1. Setup JDK in a temp directory for Micro-gw toolkit
+# 2. Setup Micro-gw toolkit
+# 3. Init a Micro-gw temp project
+# 4. Copy Swagger definitions and interceptors to Micro-gw temp project
+# 5. Build the Micro-gw temp project
+# 6. Copy ballerina service to ${APP_DIR}
+# 7. Export Micro-gw runtime path as environment variable
+##################################################################################
+
 set -euo pipefail
 
 APP_DIR=$1

@@ -16,11 +16,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Detect the Swagger definitions based on following conditions,
-# 1. File extension must be ".yaml" or ".json"
-# 2. Each definitions should contain "openapi:" or "swagger:" attributes
+#################################################################################
+# Detect the Swagger definitions and interceptors based on following conditions,
+# 1. Swagger definition file extension must be ".yaml" or ".json"
+# 2. Each definitions should contain "openapi" or "swagger" attributes
 # 3. Each definitions should contain  "x-wso2-basePath" attribute
-# 4. Each definitions should contain  "x-wso2-production-endpoints:" attribute
+# 4. Each definitions should contain  "x-wso2-production-endpoints" attribute
+# 5. Only a directory named "interceptors" is allowed beside Swagger definitions
+#################################################################################
+
 APP_DIR=${1}
 
 for file in ${APP_DIR}/*

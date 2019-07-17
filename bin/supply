@@ -16,6 +16,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
+
+#################################################################################
+# Configure Micro-gateway runtime as a dependency
+#
+#################################################################################
+
 set -euo pipefail
 
 APP_DIR=$1
