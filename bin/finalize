@@ -194,7 +194,6 @@ function initialize_project() {
 #   None
 #################################################################################
 function build_project() {
-    echo_info "Building the project ${PROJECT_NAME}"
     if ! find ${APP_DIR}/ -type f -exec cp "{}" $(pwd)/${PROJECT_NAME}/api_definitions/ \;; then
       echo_error_exit "Couldn't copy API definitions from ${APP_DIR}/ to $(pwd)/${PROJECT_NAME}/api_definitions/"
     fi
@@ -205,7 +204,7 @@ function build_project() {
          echo_error_exit "Couldn't copy interceptors from ${APP_DIR}/interceptors to $(pwd)/${PROJECT_NAME}/interceptors/"
         fi
     fi
-
+    echo_info "Building the project ${PROJECT_NAME}"
     if ! err=$(micro-gw build ${PROJECT_NAME} 2>&1); then
       echo_error_exit "Couldn't build the project ${PROJECT_NAME}. Error: ${err}"
     fi

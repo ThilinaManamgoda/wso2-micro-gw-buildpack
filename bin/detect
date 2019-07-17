@@ -39,7 +39,6 @@ for file in ${APP_DIR}/*
         if ! { [[ "${extension}" = "yaml" ]] || [[ "${extension}" = "json" ]]; }; then
           exit 1
         fi
-
         if ! grep -e "openapi:\|swagger:" ${file} > /dev/null 2>&1; then
           exit 1
         fi
