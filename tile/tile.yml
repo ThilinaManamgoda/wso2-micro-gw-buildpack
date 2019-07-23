@@ -10,41 +10,41 @@ stemcell_criteria:
   version: '170.15'
 
 forms:
-  - name: Analytics onfigurations
+  - name: buildpack_order
+    label: Buildpack order
+    description: Buildpack order
+    properties:
+      - name: buildpack_order
+        type: integer
+        label: Buildpack order
+        default: 99
+  - name: analytics_configurations
     label: Analytics configurations
     description: Analytics configurations
     properties:
       - name: enable_analytics
-        type: string
+        type: boolean
         label: Enable Analytics
-        options:
-          - name: true
-            label: true
-            default: true
-          - name: false
-            label: false
+        default: false
       - name: uploading_endpoint
         type: string
         label: Uploading endpoint
       - name: uploading_time_span_in_millis
-        type: string
+        type: integer
         label: Uploading timeSpan in Millis
+        default: 600000
       - name: rotating_period
-        type: string
+        type: integer
         label: Rotating period
-      - name: task_uploadFiles
-        type: string
+        default: 600000
+      - name: task_upload_files
+        type: boolean
         label: Task uploadFiles
-        options:
-          - name: true
-            label: true
-            default: true
-          - name: false
-            label: false
+        default: true
       - name: analytics_creds
         type: simple_credentials
         label: Analytics credentails
-  - name: Key Manager onfigurations
+  - name: key_manager_configurations
     label: Key Manager configurations
     description: Key Manager configurations
     properties:
@@ -57,19 +57,21 @@ forms:
       - name: token_context
         type: string
         label: Token context
+        default: "oauth2"
       - name: timestamp_skew
-        type: string
+        type: integer
         label: Timestamp skew
+        default: 5000
 
 packages:
-  - name: wso2-micro-gateway-buildpack
+  - name: wso2_micro_gateway_buildpack
     type: bosh-release
-    path: bosh-release/wso2am-micro-gw-buildpack-release.tgz
+    path: bosh-release/wso2am-micro-gw-3.0.0-buildpack-release.tgz
     jobs:
     - name: buildpack-deploy
       templates:
         - name: buildpack-deploy
-          release: wso2am-micro-gw-buildpack-release
+          release: wso2am-micro-gw-3.0.0-buildpack-release
       lifecycle: errand
       post_deploy: true
       memory: 512
@@ -78,36 +80,25 @@ packages:
       cpu: 2
       dynamic_ip: 1
       properties:
+        buildpack_order: (( .properties.buildpack_order.value ))
         analytics:
-          enable:
-            value: (( .properties.enable_analytics.value ))
-          uploading_endpoint:
-            value: (( .properties.uploading_endpoint.value ))
-          uploading_time_span_in_millis:
-            value: (( .properties.uploading_time_span_in_millis.value ))
-          rotating_period:
-            value: (( .properties.rotating_period.value ))
-          task_uploadFiles:
-            value: (( .properties.task_uploadFiles.value ))
-          username:
-            value: (( .properties.analytics_creds.identity ))
-          password:
-            value: (( .properties.analytics_creds.password ))
+          enable: (( .properties.enable_analytics.value ))
+          uploading_endpoint: (( .properties.uploading_endpoint.value ))
+          uploading_time_span_in_millis: (( .properties.uploading_time_span_in_millis.value ))
+          rotating_period: (( .properties.rotating_period.value ))
+          task_uploadFiles: (( .properties.task_upload_files.value ))
+          username: (( .properties.analytics_creds.identity ))
+          password: (( .properties.analytics_creds.password ))
         keymanager:
-          server_url:
-            value: (( .properties.keymanager_server_url.value ))
-          username:
-            value: (( .properties.keymanager_creds.identity ))
-          password:
-            value: (( .properties.keymanager_creds.password ))
-          token_context:
-            value: (( .properties.token_context.value ))
-          timestamp_skew:
-            value: (( .properties.timestamp_skew.value ))
+          server_url: (( .properties.keymanager_server_url.value ))
+          username: (( .properties.keymanager_creds.identity ))
+          password: (( .properties.keymanager_creds.password ))
+          token_context: (( .properties.token_context.value ))
+          timestamp_skew: (( .properties.timestamp_skew.value ))
     - name: buildpack-delete
       templates:
         - name: buildpack-delete
-          release: wso2am-micro-gw-buildpack-release
+          release: wso2am-micro-gw-3.0.0-buildpack-release
       lifecycle: errand
       pre_delete: true
       memory: 512

@@ -1,4 +1,0 @@
-# abort script on any command that exit with a non zero value
-set -e
-
-cp micro_gateway_buildpack/wso2am-micro-gw_buildpack-cached-v1.0.0.zip ${BOSH_INSTALL_TARGET}

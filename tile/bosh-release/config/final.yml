@@ -22,4 +22,4 @@ blobstore:
   provider: local
   options:
     blobstore_path: /tmp/wso2am-micor-gw-release-blobs
-final_name: wso2am-micro-gw-buildpack-release
+final_name: wso2am-micro-gw-3.0.0-buildpack-release

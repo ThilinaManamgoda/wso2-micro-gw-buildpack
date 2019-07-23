@@ -1,10 +1,12 @@
 ---
-name: buildpack-delete
+name: buildpack-deploy
 templates:
-  buildpack-delete.sh.erb: bin/run
+  buildpack-deploy.sh.erb: bin/run
   opsmgr.env.erb: bin/opsmgr.env
 packages:
 - cf_cli
+
+
 properties:
   domain:
     description: 'CloudFoundry system domain'
@@ -36,11 +38,31 @@ properties:
     description: 'Basic auth user'
   security.password:
     description: 'Basic auth password'
-  tls_cacert:
-    description: "Ops Manager's CA certificate"
-  pks_username:
-    description: 'Username for the PKS API'
-  pks_password:
-    description: 'Password for the PKS API'
+  buildpack_order:
+    description: 'Order of the Buildpack'
+  analytics.enable:
+    description: 'Enable Analytics'
+  analytics.uploading_endpoint:
+    description: 'Uploading endpoint'
+  analytics.uploading_time_span_in_millis:
+    description: 'Uploading timeSpan in Millis'
+  analytics.rotating_period:
+    description: 'Rotating period'
+  analytics.task_uploadFiles:
+    description: 'Task uploadFiles'
+  analytics.username:
+    description: 'Analytics username'
+  analytics.password:
+     description: 'Analytics password'
+  keymanager.server_url:
+    description: 'Server URL'
+  keymanager.username:
+    description: 'Key Manager username'
+  keymanager.password:
+    description: 'Key Manager password'
+  keymanager.token_context:
+    description: 'Token context'
+  keymanager.timestamp_skew:
+    description: 'Timestamp skew'
 
 consumes:
