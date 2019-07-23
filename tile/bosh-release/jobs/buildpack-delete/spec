@@ -1,0 +1,52 @@
+---
+name: buildpack-delete
+templates:
+  buildpack-delete.sh.erb: bin/run
+  opsmgr.env.erb: bin/opsmgr.env
+packages:
+- micro_gateway_buildpack
+- cf_cli
+properties:
+  domain:
+    description: 'CloudFoundry system domain'
+  app_domains:
+    description: 'CloudFoundry application domains'
+  org:
+    description: 'Org for the Application'
+    default: ''
+  space:
+    description: 'Space for the Application'
+    default: ''
+  ssl.skip_cert_verify:
+    description: 'Whether to verify SSL certs when making web requests'
+  cf.admin_user:
+    description: 'Username of the CF admin user'
+  cf.admin_password:
+    description: 'Password of the CF admin user'
+  uaa.admin_client:
+    description: 'Name of the UAA Admin Client'
+  uaa.admin_client_secret:
+    description: 'Password of the UAA Admin Client'
+  apply_open_security_group:
+    description: 'Open security group for the app to access outside'
+    default: false
+  allow_paid_service_plans:
+    description: 'Allow use of paid service plans'
+    default: false
+  security.user:
+    description: 'Basic auth user'
+  security.password:
+    description: 'Basic auth password'
+  tls_cacert:
+    description: "Ops Manager's CA certificate"
+  pks_username:
+    description: 'Username for the PKS API'
+  pks_password:
+    description: 'Password for the PKS API'
+  micro_gateway_buildpack.name:
+    description: 'Name of package'
+  micro_gateway_buildpack.buildpack_order:
+    default: 99
+    description: 'Order of the Buildpack'
+
+consumes:

@@ -1,0 +1,9 @@
+cf_cli/all_open.json:
+  size: 80
+  sha: 5915785ed61178f2a4988de73517c1ef986146de
+cf_cli/cf-linux-amd64.tgz:
+  size: 8001984
+  sha: cf38846d55d32bf18fb75d7498894cb94035c7e1
+micro_gateway_buildpack/wso2am-micro-gw_buildpack-cached-v1.0.0.zip:
+  size: 369234634
+  sha: 547e9370d18d852423c112ebc5e77ce1585cf68f

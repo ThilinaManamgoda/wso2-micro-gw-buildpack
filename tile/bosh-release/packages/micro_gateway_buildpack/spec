@@ -1,0 +1,8 @@
+---
+name: micro_gateway_buildpack
+
+dependencies: []
+
+files:
+- micro_gateway_buildpack/wso2am-micro-gw_buildpack-cached-v1.0.0.zip
+

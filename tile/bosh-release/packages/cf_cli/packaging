@@ -1,0 +1,5 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+tar -C ${BOSH_INSTALL_TARGET} -vxf cf_cli/cf-linux-amd64.tgz
+cp cf_cli/all_open.json ${BOSH_INSTALL_TARGET}

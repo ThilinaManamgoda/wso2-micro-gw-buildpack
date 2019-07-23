@@ -1,0 +1,117 @@
+---
+name: wso2-micro-gateway-buildpack
+icon_file: resources/wso2-logo.png
+label: WSO2 Micro-gateway Buildpack
+description: WSO2 Micro-gateway Buildpack
+
+stemcell_criteria:
+  os: ubuntu-xenial
+  requires_cpi: false
+  version: '170.15'
+
+forms:
+  - name: Analytics onfigurations
+    label: Analytics configurations
+    description: Analytics configurations
+    properties:
+      - name: enable_analytics
+        type: string
+        label: Enable Analytics
+        options:
+          - name: true
+            label: true
+            default: true
+          - name: false
+            label: false
+      - name: uploading_endpoint
+        type: string
+        label: Uploading endpoint
+      - name: uploading_time_span_in_millis
+        type: string
+        label: Uploading timeSpan in Millis
+      - name: rotating_period
+        type: string
+        label: Rotating period
+      - name: task_uploadFiles
+        type: string
+        label: Task uploadFiles
+        options:
+          - name: true
+            label: true
+            default: true
+          - name: false
+            label: false
+      - name: analytics_creds
+        type: simple_credentials
+        label: Analytics credentails
+  - name: Key Manager onfigurations
+    label: Key Manager configurations
+    description: Key Manager configurations
+    properties:
+      - name: keymanager_server_url
+        type: string
+        label: Server URL
+      - name: keymanager_creds
+        type: simple_credentials
+        label: Key Manager credentails
+      - name: token_context
+        type: string
+        label: Token context
+      - name: timestamp_skew
+        type: string
+        label: Timestamp skew
+
+packages:
+  - name: wso2-micro-gateway-buildpack
+    type: bosh-release
+    path: bosh-release/wso2am-micro-gw-buildpack-release.tgz
+    jobs:
+    - name: buildpack-deploy
+      templates:
+        - name: buildpack-deploy
+          release: wso2am-micro-gw-buildpack-release
+      lifecycle: errand
+      post_deploy: true
+      memory: 512
+      ephemeral_disk: 4096
+      persistent_disk: 0
+      cpu: 2
+      dynamic_ip: 1
+      properties:
+        analytics:
+          enable:
+            value: (( .properties.enable_analytics.value ))
+          uploading_endpoint:
+            value: (( .properties.uploading_endpoint.value ))
+          uploading_time_span_in_millis:
+            value: (( .properties.uploading_time_span_in_millis.value ))
+          rotating_period:
+            value: (( .properties.rotating_period.value ))
+          task_uploadFiles:
+            value: (( .properties.task_uploadFiles.value ))
+          username:
+            value: (( .properties.analytics_creds.identity ))
+          password:
+            value: (( .properties.analytics_creds.password ))
+        keymanager:
+          server_url:
+            value: (( .properties.keymanager_server_url.value ))
+          username:
+            value: (( .properties.keymanager_creds.identity ))
+          password:
+            value: (( .properties.keymanager_creds.password ))
+          token_context:
+            value: (( .properties.token_context.value ))
+          timestamp_skew:
+            value: (( .properties.timestamp_skew.value ))
+    - name: buildpack-delete
+      templates:
+        - name: buildpack-delete
+          release: wso2am-micro-gw-buildpack-release
+      lifecycle: errand
+      pre_delete: true
+      memory: 512
+      ephemeral_disk: 4096
+      persistent_disk: 0
+      cpu: 2
+      dynamic_ip: 1
