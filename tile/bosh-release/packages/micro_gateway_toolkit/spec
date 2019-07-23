@@ -1,0 +1,8 @@
+---
+name: micro_gateway_toolkit
+
+dependencies: []
+
+files:
+- micro_gateway_toolkit/wso2am-micro-gw-toolkit-3.0.2-SNAPSHOT.zip
+

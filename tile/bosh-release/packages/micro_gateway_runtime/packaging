@@ -1,0 +1,4 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+cp micro_gateway_runtime/wso2am-micro-gw-linux-3.0.1.zip ${BOSH_INSTALL_TARGET}

@@ -3,9 +3,14 @@ name: buildpack-deploy
 templates:
   buildpack-deploy.sh.erb: bin/run
   opsmgr.env.erb: bin/opsmgr.env
+  config/micro-gw.conf: config/micro-gw.conf
 packages:
 - cf_cli
-
+- openjdk
+- buildpack_packager
+- micro_gateway_runtime
+- micro_gateway_toolkit
+- buildpack_resources
 
 properties:
   domain:

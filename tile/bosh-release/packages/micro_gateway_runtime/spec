@@ -1,0 +1,8 @@
+---
+name: micro_gateway_runtime
+
+dependencies: []
+
+files:
+- micro_gateway_runtime/wso2am-micro-gw-linux-3.0.1.zip
+

@@ -1,6 +1,9 @@
-buildpack_packager/buildpack_packager:
-  size: 11000438
-  sha: c026733b44de2c6fd4f42a8588caafecf1694dd3
+buildpack_packager/buildpack-packager.tgz:
+  size: 11002368
+  sha: 8ca525c6a18a8adcd7883cba74dc601f58a75bf5
+buildpack_resources/buildpack_resources.zip:
+  size: 6161
+  sha: 9f0d9eb048bdedcbf1d5bba509706a3b52c97bbe
 cf_cli/all_open.json:
   size: 80
   sha: 5915785ed61178f2a4988de73517c1ef986146de

@@ -3,6 +3,10 @@
 export PATH="/var/vcap/packages/cf_cli:$PATH"
 export CF=`which cf`
 
+
+script_dir=$(dirname $0)
+job_dir=${script_dir}/..
+
 function cf() {
 	echo cf "$@"
 	output=$($CF "$@" 2>&1)
@@ -287,15 +291,14 @@ function push_buildpack() {
 	BUILDPACK_NAME="$1"
 	BUILDPACK_ORDER="$2"
 	BUILDPACK_FILE="$3"
-	BUILDPACK_VERSIONED=`echo "${BUILDPACK_FILE}" | sed 's/\.zip$/-v0.0.2.zip/'`
-	cp "${BUILDPACK_FILE}" "${BUILDPACK_VERSIONED}"
 	$CF buildpacks | grep ${BUILDPACK_NAME} >/dev/null
 	if [ "$?" -eq "0" ]; then
-		cf update-buildpack $BUILDPACK_NAME -p $BUILDPACK_VERSIONED --enable
+		cf update-buildpack ${BUILDPACK_NAME} -p ${BUILDPACK_FILE} --enable
 	else
-		cf create-buildpack $BUILDPACK_NAME $BUILDPACK_VERSIONED $BUILDPACK_ORDER --enable
+		cf create-buildpack ${BUILDPACK_NAME} ${BUILDPACK_FILE} ${BUILDPACK_ORDER} --enable
 	fi
 }
+
 
 
 # Function for version comparison based on a code fragment from Stack Overflow
@@ -334,28 +337,66 @@ function is_newer() {
     done
     return 0
 }
+
+function export_wso2_buildpack_env() {
+   export WSO2_AM_GW_RUNTIME_VERSION="3.0.1"
+   export WSO2_AM_GW_TOOLKIT_VERSION="3.0.2-SNAPSHOT"
+   export MICRO_GW_RUNTIME_PATH="${PACKAGE_PATH}/micro_gateway_runtime"
+   export MICRO_GW_RUNTIME_DIST="${PACKAGE_PATH}/micro_gateway_runtime/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip"
+   export MICRO_GW_TOOLKIT_DIST="${PACKAGE_PATH}/micro_gateway_toolkit/wso2am-micro-gw-toolkit-${WSO2_AM_GW_TOOLKIT_VERSION}.zip"
+   export OPENJDK_DIST="${PACKAGE_PATH}/openjdk/OpenJDK8U-jdk_x64_linux_hotspot_8u212b04.tar.gz"
+   export BUILDPACK_PATH="${PACKAGE_PATH}/buildpack_resources"
+}
+
+function configure_micro_gw_runtime() {
+    pushd ${MICRO_GW_RUNTIME_PATH}
+        unzip -q wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip
+        rm wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip
+    popd
+    pushd ${job_dir}/config
+    echo "$(cat micro-gw.conf)"
+    popd
+
+    cp ${job_dir}/config/micro-gw.conf ${MICRO_GW_RUNTIME_PATH}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/conf/
+
+    pushd ${MICRO_GW_RUNTIME_PATH}
+        zip -q -r wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/*
+    popd
+}
+
+function configure_buildpack() {
+    cp ${MICRO_GW_RUNTIME_DIST} ${BUILDPACK_PATH}/resources/
+    cp ${OPENJDK_DIST} ${BUILDPACK_PATH}/resources/
+    cp ${MICRO_GW_TOOLKIT_DIST} ${BUILDPACK_PATH}/resources/
+}
+
+function create_buildpack() {
+    pushd ${BUILDPACK_PATH}
+        if ! zip -r wso2am-micro-gw_buildpack-cached-v1.0.0.zip bin VERSION manifest.yml resources; then
+          echo "Couldn't zip the Build pack"
+        fi
+        echo "buildpack path: $(ls -l)"
+    popd
+}
+
+
 echo "====================================================WSO2============================================================================"
-export ANALYTICS_ENABLE=<%= properties.analytics.enable %>
-echo ${ANALYTICS_ENABLE}
+
+setup_package_path
+export_wso2_buildpack_env
+configure_micro_gw_runtime
+configure_buildpack
+create_buildpack
 import_opsmgr_variables
 prepare_cf_cli
-setup_package_path
 authenticate
 setup_target_org
 setup_target_space
 add_target_org_to_admin
 
-
-# Deploy package micro_gateway_buildpack
-#
-
-
-
-
-
-export BUILDPACK_NAME=micro_gateway_buildpack
+export BUILDPACK_NAME=wso2_micro_gateway_buildpack
 export BUILDPACK_ORDER=<%= Shellwords.escape properties.buildpack_order %>
-export BUILDPACK_FILE=$PACKAGE_PATH/micro_gateway_buildpack/wso2am-micro-gw_buildpack-cached-v1.0.0.zip
+export BUILDPACK_FILE=${BUILDPACK_PATH}/wso2am-micro-gw_buildpack-cached-v1.0.0.zip
 push_buildpack "$BUILDPACK_NAME" "$BUILDPACK_ORDER" "$BUILDPACK_FILE"
 
 

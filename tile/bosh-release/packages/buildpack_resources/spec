@@ -1,0 +1,7 @@
+---
+name: buildpack_resources
+
+dependencies: []
+
+files:
+- buildpack_resources/buildpack_resources.zip

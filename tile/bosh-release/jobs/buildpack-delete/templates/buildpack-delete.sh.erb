@@ -98,7 +98,7 @@ echo "============ script wso2 delete buildpack============="
 if target_org; then
 	if target_space; then
 	    echo "============ deleting wso2 buildpack============="
-		cf delete-buildpack -f micro_gateway_buildpack
+		cf delete-buildpack -f wso2_micro_gateway_buildpack
 		delete_empty_space
 	fi
 	delete_empty_org

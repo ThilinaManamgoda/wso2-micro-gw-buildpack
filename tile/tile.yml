@@ -29,6 +29,7 @@ forms:
       - name: uploading_endpoint
         type: string
         label: Uploading endpoint
+        default: "https://localhost:9444/analytics/v1.0/usage/upload-file"
       - name: uploading_time_span_in_millis
         type: integer
         label: Uploading timeSpan in Millis
@@ -51,6 +52,7 @@ forms:
       - name: keymanager_server_url
         type: string
         label: Server URL
+        default: "https://localhost:9443"
       - name: keymanager_creds
         type: simple_credentials
         label: Key Manager credentails

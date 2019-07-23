@@ -1,0 +1,4 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+cp micro_gateway_toolkit/wso2am-micro-gw-toolkit-3.0.2-SNAPSHOT.zip ${BOSH_INSTALL_TARGET}

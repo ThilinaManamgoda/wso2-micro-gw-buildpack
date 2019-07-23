@@ -1,0 +1,4 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+unzip buildpack_resources/buildpack_resources.zip -d ${BOSH_INSTALL_TARGET}
