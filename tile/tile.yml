@@ -27,7 +27,7 @@ forms:
         label: Enable Analytics
         default: false
       - name: uploading_endpoint
-        type: string
+        type: http_url
         label: Uploading endpoint
         default: "https://localhost:9444/analytics/v1.0/usage/upload-file"
       - name: uploading_time_span_in_millis
@@ -50,7 +50,7 @@ forms:
     description: Key Manager configurations
     properties:
       - name: keymanager_server_url
-        type: string
+        type: http_url
         label: Server URL
         default: "https://localhost:9443"
       - name: keymanager_creds
