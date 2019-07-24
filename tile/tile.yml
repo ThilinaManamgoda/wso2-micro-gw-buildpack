@@ -18,6 +18,18 @@ forms:
         type: integer
         label: Buildpack order
         default: 99
+  - name: trusted_certs
+    label: Trusted certificates
+    description: Trusted certificates
+    properties:
+      - name: jwt_cert
+        label: Certificate for JWT token signature verification
+        type: ca_certificate
+        configurable: true
+      - name: certs
+        label: Trusted CA certificates for http client
+        type: ca_certificate
+        configurable: true
   - name: analytics_configurations
     label: Analytics configurations
     description: Analytics configurations
@@ -82,6 +94,8 @@ packages:
       cpu: 2
       dynamic_ip: 1
       properties:
+        certs: (( .properties.certs.value ))
+        jwt_cert: (( .properties.jwt_cert.value ))
         buildpack_order: (( .properties.buildpack_order.value ))
         analytics:
           enable: (( .properties.enable_analytics.value ))

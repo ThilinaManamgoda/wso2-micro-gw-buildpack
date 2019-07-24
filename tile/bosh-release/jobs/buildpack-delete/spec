@@ -43,4 +43,5 @@ properties:
   pks_password:
     description: 'Password for the PKS API'
 
+
 consumes:
