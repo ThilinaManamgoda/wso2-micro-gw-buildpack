@@ -22,15 +22,8 @@ properties:
     description: 'Username of the CF admin user'
   cf.admin_password:
     description: 'Password of the CF admin user'
-  uaa.admin_client:
-    description: 'Name of the UAA Admin Client'
-  uaa.admin_client_secret:
-    description: 'Password of the UAA Admin Client'
   apply_open_security_group:
     description: 'Open security group for the app to access outside'
-    default: false
-  allow_paid_service_plans:
-    description: 'Allow use of paid service plans'
     default: false
   security.user:
     description: 'Basic auth user'
@@ -38,10 +31,5 @@ properties:
     description: 'Basic auth password'
   tls_cacert:
     description: "Ops Manager's CA certificate"
-  pks_username:
-    description: 'Username for the PKS API'
-  pks_password:
-    description: 'Password for the PKS API'
-
 
 consumes:

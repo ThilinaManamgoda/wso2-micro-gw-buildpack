@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xve
+
 export PATH="/var/vcap/packages/cf_cli:$PATH"
 export CF=`which cf`
 
@@ -138,7 +138,6 @@ function export_wso2_buildpack_env() {
 
 function setup_certs() {
     export CERTS="<%= p("certs") %>"
-    echo "$CERTS"
     if [[ ! -z "${CERTS}" ]]; then
         mkdir ${script_dir}/certs
         echo ${CERTS} >> ${script_dir}/certs/all_certs
@@ -149,15 +148,12 @@ function setup_certs() {
           {print > "cert" n ".pem"}' < all_certs
         popd
         rm ${script_dir}/certs/all_certs
-        echo "certs: $(ls -l ${script_dir}/certs)"
     fi
 
     export JWT_CERT="<%= p("jwt_cert") %>"
-    echo "${JWT_CERT}"
     if [[ ! -z "${JWT_CERT}" ]]; then
         mkdir ${script_dir}/jwtcert
         echo ${JWT_CERT} >> ${script_dir}/jwtcert/jwtcert
-        echo "jwt: $(ls -l ${script_dir}/jwtcert/jwtcert)"
     fi
 }
 
@@ -169,13 +165,11 @@ function configure_micro_gw_runtime() {
         rm wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}.zip
     popd
     if [ ! -z "${CERTS}" -o ! -z "${JWT_CERT}" ]; then
-
         pushd ${MICRO_GW_RUNTIME_PATH}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/
             unzip -q runtime.zip -d runtime
             rm runtime.zip
         popd
         if [[ ! -z "${CERTS}" ]]; then
-            echo "CERTS"
             for cert in "${script_dir}/certs"/*
             do
               cert_file=$(basename -- "$cert")
@@ -185,7 +179,6 @@ function configure_micro_gw_runtime() {
         fi
 
         if [[ ! -z "${JWT_CERT}" ]]; then
-            echo "JWT"
            # Deletes the current alias "wso2apim"
            ${KEYTOOL} -delete -noprompt -alias wso2apim  -keystore ${MICRO_GW_RUNTIME_PATH}/wso2am-micro-gw-linux-${WSO2_AM_GW_RUNTIME_VERSION}/runtime/bre/security/ballerinaTruststore.p12 -storepass ${TRUST_STORE_PASSWORD}
            # Import the new JWT validation cert
@@ -217,9 +210,6 @@ function create_buildpack() {
      zip -r wso2am-micro-gw_buildpack-cached-v1.0.0.zip bin VERSION manifest.yml resources
     popd
 }
-
-
-echo "====================================================WSO2============================================================================"
 
 setup_package_path
 export_wso2_buildpack_env
