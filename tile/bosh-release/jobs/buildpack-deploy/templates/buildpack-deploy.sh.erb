@@ -134,6 +134,7 @@ function export_wso2_buildpack_env() {
    export OPENJDK_DIST="${PACKAGE_PATH}/openjdk/OpenJDK8U-jdk_x64_linux_hotspot_8u212b04.tar.gz"
    export BUILDPACK_PATH="${PACKAGE_PATH}/buildpack_resources"
    export TRUST_STORE_PASSWORD="ballerina"
+   export BUILDPACK_VERSION="v1.0.0"
 }
 
 function setup_certs() {
@@ -207,7 +208,7 @@ function configure_buildpack() {
 
 function create_buildpack() {
     pushd ${BUILDPACK_PATH}
-     zip -r wso2am-micro-gw_buildpack-cached-v1.0.0.zip bin VERSION manifest.yml resources
+     zip -r wso2am-micro-gw_buildpack-${BUILDPACK_VERSION}.zip bin VERSION manifest.yml resources
     popd
 }
 
@@ -225,7 +226,7 @@ add_target_org_to_admin
 
 export BUILDPACK_NAME=wso2_micro_gateway_buildpack
 export BUILDPACK_ORDER=<%= Shellwords.escape properties.buildpack_order %>
-export BUILDPACK_FILE=${BUILDPACK_PATH}/wso2am-micro-gw_buildpack-cached-v1.0.0.zip
+export BUILDPACK_FILE=${BUILDPACK_PATH}/wso2am-micro-gw_buildpack-${BUILDPACK_VERSION}.zip
 push_buildpack "$BUILDPACK_NAME" "$BUILDPACK_ORDER" "$BUILDPACK_FILE"
 
 

@@ -1,8 +1,8 @@
 ---
-name: wso2-micro-gateway-buildpack
+name: wso2am-micro-gateway-buildpack
 icon_file: resources/wso2-logo.png
-label: WSO2 Micro-gateway Buildpack
-description: WSO2 Micro-gateway Buildpack
+label: WSO2 API Micro-gateway Buildpack
+description: WSO2 API Micro-gateway Buildpack
 
 stemcell_criteria:
   os: ubuntu-xenial
@@ -76,9 +76,34 @@ forms:
         type: integer
         label: Timestamp skew
         default: 5000
-
+  - name: throttling_configurations
+    label: Global throttling configurations
+    description: Global throttling configurations
+    properties:
+      - name: enable_throttling
+        type: boolean
+        label: Enable Global throttling
+        default: false
+      - name: jms_connection_initial_context_factory
+        type: string
+        label: JMS connection initial context factory
+        default: "bmbInitialContextFactory"
+      - name: jms_connection_provider_url
+        type: string
+        label: JMS connection provider URL
+        default: "amqp://admin:admin@carbon/carbon?brokerlist='tcp://localhost:5672'"
+      - name: jms_connection_creds
+        type: simple_credentials
+        label: JMS connection credentials
+      - name: throttle_endpoint_url
+        type: http_url
+        label: Throttling endpoint URL
+        default: "https://localhost:9443/endpoints"
+      - name: throttle_endpoint_base64_header_creds
+        type: simple_credentials
+        label: Throttling endpoint base 64 header
 packages:
-  - name: wso2_micro_gateway_buildpack
+  - name: wso2am_micro_gateway_buildpack
     type: bosh-release
     path: bosh-release/wso2am-micro-gw-3.0.0-buildpack-release.tgz
     jobs:
@@ -111,6 +136,15 @@ packages:
           password: (( .properties.keymanager_creds.password ))
           token_context: (( .properties.token_context.value ))
           timestamp_skew: (( .properties.timestamp_skew.value ))
+        throttling:
+          enable: (( .properties.enable_throttling.value ))
+          jms_connection_initial_context_factory: (( .properties.enable_throttling.value ))
+          jms_connection_provider_url: (( .properties.jms_connection_provider_url.value ))
+          jms_connection_username: (( .properties.jms_connection_creds.identity ))
+          jms_connection_password: (( .properties.jms_connection_creds.password ))
+          throttle_endpoint_url: (( .properties.throttle_endpoint_url.value ))
+          throttle_endpoint_base64_header_username: (( .properties.throttle_endpoint_base64_header_creds.identity ))
+          throttle_endpoint_base64_header_password: (( .properties.throttle_endpoint_base64_header_creds.password ))
     - name: buildpack-delete
       templates:
         - name: buildpack-delete

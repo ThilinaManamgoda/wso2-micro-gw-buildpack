@@ -1,8 +1,0 @@
----
-name: buildpack_packager
-
-dependencies: []
-
-files:
-- buildpack_packager/buildpack-packager.tgz
-

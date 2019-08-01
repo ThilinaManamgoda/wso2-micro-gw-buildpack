@@ -1,4 +1,0 @@
-# abort script on any command that exit with a non zero value
-set -e
-
-tar -C ${BOSH_INSTALL_TARGET} -vxf buildpack_packager/buildpack-packager.tgz

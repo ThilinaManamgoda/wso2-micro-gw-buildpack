@@ -1,6 +1,3 @@
-buildpack_packager/buildpack-packager.tgz:
-  size: 11002368
-  sha: 8ca525c6a18a8adcd7883cba74dc601f58a75bf5
 buildpack_resources/buildpack_resources.zip:
   size: 6161
   sha: 9f0d9eb048bdedcbf1d5bba509706a3b52c97bbe
@@ -10,9 +7,6 @@ cf_cli/all_open.json:
 cf_cli/cf-linux-amd64.tgz:
   size: 8001984
   sha: cf38846d55d32bf18fb75d7498894cb94035c7e1
-micro_gateway_buildpack/wso2am-micro-gw_buildpack-cached-v1.0.0.zip:
-  size: 369234634
-  sha: 547e9370d18d852423c112ebc5e77ce1585cf68f
 micro_gateway_runtime/wso2am-micro-gw-linux-3.0.1.zip:
   size: 85825952
   sha: 3234722288a6da6b9bfdcb787e4d842f64e985ba

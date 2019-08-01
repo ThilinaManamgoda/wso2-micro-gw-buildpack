@@ -7,7 +7,6 @@ templates:
 packages:
 - cf_cli
 - openjdk
-- buildpack_packager
 - micro_gateway_runtime
 - micro_gateway_toolkit
 - buildpack_resources
@@ -62,4 +61,22 @@ properties:
     description: 'Trusted CA certificates'
   jwt_cert:
     description: 'Certificate for JWT tokens'
+  throttling.enable:
+    description: 'Enable global throttling'
+  throttling.jms_connection_initial_context_factory:
+    description: 'Global throttling JMS connection initial context factory'
+  throttling.jms_connection_provider_url:
+    description: 'Global throttling JMS connection provider URL'
+  throttling.jms_connection_username:
+    description: 'Global throttling JMS connection username'
+  throttling.jms_connection_password:
+    description: 'Global throttling JMS connection password'
+  throttling.throttle_endpoint_url:
+    description: 'Global throttling endpoint URL'
+  throttling.throttle_endpoint_base64_header_username:
+    description: 'Global throttling endpoint base 64 header username'
+  throttling.throttle_endpoint_base64_header_password:
+    description: 'Global throttling endpoint base 64 header password'
 consumes:
+
+

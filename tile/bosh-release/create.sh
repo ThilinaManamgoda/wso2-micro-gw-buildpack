@@ -28,11 +28,9 @@ touch config/blobs.yml
 # Upload blobs
 bosh add-blob ${SCRIPT_DIR}/dist/cf_cli/cf-linux-amd64.tgz cf_cli/cf-linux-amd64.tgz
 bosh add-blob ${SCRIPT_DIR}/dist/cf_cli/all_open.json cf_cli/all_open.json
-bosh add-blob ${SCRIPT_DIR}/dist/buildpack-packager.tgz buildpack_packager/buildpack-packager.tgz
 bosh add-blob ${SCRIPT_DIR}/dist/${jdk_distribution} openjdk/${jdk_distribution}
 bosh add-blob ${SCRIPT_DIR}/dist/buildpack_resources.zip buildpack_resources/buildpack_resources.zip
 bosh add-blob ${SCRIPT_DIR}/dist/wso2am-micro-gw-linux-3.0.1.zip micro_gateway_runtime/wso2am-micro-gw-linux-3.0.1.zip
 bosh add-blob ${SCRIPT_DIR}/dist/wso2am-micro-gw-toolkit-3.0.2-SNAPSHOT.zip micro_gateway_toolkit/wso2am-micro-gw-toolkit-3.0.2-SNAPSHOT.zip
-bosh add-blob ${SCRIPT_DIR}/dist/wso2am-micro-gw_buildpack-cached-v1.0.0.zip micro_gateway_buildpack/wso2am-micro-gw_buildpack-cached-v1.0.0.zip
 # Create the Bosh release
 bosh create-release --tarball wso2am-micro-gw-3.0.0-buildpack-release.tgz --force
