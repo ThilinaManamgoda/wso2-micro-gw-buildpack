@@ -138,7 +138,7 @@ packages:
           timestamp_skew: (( .properties.timestamp_skew.value ))
         throttling:
           enable: (( .properties.enable_throttling.value ))
-          jms_connection_initial_context_factory: (( .properties.enable_throttling.value ))
+          jms_connection_initial_context_factory: (( .properties.jms_connection_initial_context_factory.value ))
           jms_connection_provider_url: (( .properties.jms_connection_provider_url.value ))
           jms_connection_username: (( .properties.jms_connection_creds.identity ))
           jms_connection_password: (( .properties.jms_connection_creds.password ))
